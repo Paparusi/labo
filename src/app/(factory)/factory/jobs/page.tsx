@@ -13,9 +13,9 @@ import { formatSalaryRange } from '@/lib/geo'
 import type { User, Job } from '@/types'
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  active: { label: 'Dang tuyen', color: 'bg-green-100 text-green-700' },
-  closed: { label: 'Da dong', color: 'bg-gray-100 text-gray-700' },
-  draft: { label: 'Ban nhap', color: 'bg-yellow-100 text-yellow-700' },
+  active: { label: 'Đang tuyển', color: 'bg-green-100 text-green-700' },
+  closed: { label: 'Đã đóng', color: 'bg-gray-100 text-gray-700' },
+  draft: { label: 'Bản nháp', color: 'bg-yellow-100 text-yellow-700' },
 }
 
 export default function FactoryJobsPage() {
@@ -69,9 +69,9 @@ export default function FactoryJobsPage() {
       <Header user={user} />
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Tin tuyen dung</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Tin tuyển dụng</h1>
           <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-            <Link href="/factory/jobs/new"><Plus className="h-4 w-4 mr-2" />Dang tin moi</Link>
+            <Link href="/factory/jobs/new"><Plus className="h-4 w-4 mr-2" />Đăng tin mới</Link>
           </Button>
         </div>
 
@@ -82,19 +82,19 @@ export default function FactoryJobsPage() {
         ) : (
           <Tabs defaultValue="all">
             <TabsList className="mb-4">
-              <TabsTrigger value="all">Tat ca ({jobs.length})</TabsTrigger>
-              <TabsTrigger value="active">Dang tuyen ({filterByStatus('active').length})</TabsTrigger>
-              <TabsTrigger value="draft">Ban nhap ({filterByStatus('draft').length})</TabsTrigger>
-              <TabsTrigger value="closed">Da dong ({filterByStatus('closed').length})</TabsTrigger>
+              <TabsTrigger value="all">Tất cả ({jobs.length})</TabsTrigger>
+              <TabsTrigger value="active">Đang tuyển ({filterByStatus('active').length})</TabsTrigger>
+              <TabsTrigger value="draft">Bản nháp ({filterByStatus('draft').length})</TabsTrigger>
+              <TabsTrigger value="closed">Đã đóng ({filterByStatus('closed').length})</TabsTrigger>
             </TabsList>
 
             {['all', 'active', 'draft', 'closed'].map(tab => (
               <TabsContent key={tab} value={tab} className="space-y-3">
                 {filterByStatus(tab).length === 0 ? (
                   <div className="text-center py-12 text-gray-500">
-                    <p>Khong co tin tuyen dung nao</p>
+                    <p>Không có tin tuyển dụng nào</p>
                     <Button asChild className="mt-3 bg-emerald-600 hover:bg-emerald-700">
-                      <Link href="/factory/jobs/new">Dang tin ngay</Link>
+                      <Link href="/factory/jobs/new">Đăng tin ngay</Link>
                     </Button>
                   </div>
                 ) : (
@@ -111,7 +111,7 @@ export default function FactoryJobsPage() {
                             </div>
                             <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-500">
                               <span>{formatSalaryRange(job.salary_min, job.salary_max)}</span>
-                              <span>{job.positions} vi tri</span>
+                              <span>{job.positions} vị trí</span>
                               {job.address && (
                                 <span className="flex items-center gap-1">
                                   <MapPin className="h-3.5 w-3.5" />{job.address}
@@ -119,7 +119,7 @@ export default function FactoryJobsPage() {
                               )}
                               <span className="flex items-center gap-1">
                                 <Users className="h-3.5 w-3.5" />
-                                {job._applications_count || 0} ung vien
+                                {job._applications_count || 0} ứng viên
                               </span>
                               <span className="flex items-center gap-1">
                                 <Clock className="h-3.5 w-3.5" />
@@ -135,11 +135,11 @@ export default function FactoryJobsPage() {
                             </Button>
                             {job.status === 'active' ? (
                               <Button variant="ghost" size="sm" onClick={() => toggleJobStatus(job.id, 'closed')}>
-                                Dong
+                                Đóng
                               </Button>
                             ) : job.status === 'closed' || job.status === 'draft' ? (
                               <Button variant="ghost" size="sm" onClick={() => toggleJobStatus(job.id, 'active')}>
-                                Mo lai
+                                Mở lại
                               </Button>
                             ) : null}
                             {job.status === 'draft' && (

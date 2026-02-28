@@ -59,8 +59,8 @@ export default function JobDetailPage() {
       await supabase.from('notifications').insert({
         user_id: app.worker_id,
         type: status === 'accepted' ? 'application_accepted' : 'application_rejected',
-        title: status === 'accepted' ? 'Chuc mung! Don ung tuyen da duoc chap nhan' : 'Don ung tuyen khong duoc chap nhan',
-        message: `Don ung tuyen vi tri "${(job as Record<string, unknown>)?.title}" da ${status === 'accepted' ? 'duoc chap nhan' : 'bi tu choi'}`,
+        title: status === 'accepted' ? 'Chúc mừng! Đơn ứng tuyển đã được chấp nhận' : 'Đơn ứng tuyển không được chấp nhận',
+        message: `Đơn ứng tuyển vị trí "${(job as Record<string, unknown>)?.title}" đã ${status === 'accepted' ? 'được chấp nhận' : 'bị từ chối'}`,
         data: { job_id: id, application_id: appId },
       })
     }
@@ -80,7 +80,7 @@ export default function JobDetailPage() {
       <div className="min-h-screen bg-gray-50">
         <Header user={user} />
         <div className="container mx-auto px-4 py-6 text-center">
-          <p>Khong tim thay tin tuyen dung</p>
+          <p>Không tìm thấy tin tuyển dụng</p>
         </div>
       </div>
     )
@@ -95,7 +95,7 @@ export default function JobDetailPage() {
       <Header user={user} />
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <Button variant="ghost" asChild className="mb-4">
-          <Link href="/factory/jobs"><ArrowLeft className="h-4 w-4 mr-2" />Quay lai</Link>
+          <Link href="/factory/jobs"><ArrowLeft className="h-4 w-4 mr-2" />Quay lại</Link>
         </Button>
 
         {/* Job Info */}
@@ -104,7 +104,7 @@ export default function JobDetailPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-3">{job.title as string}</h1>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
               <span className="flex items-center gap-1"><Banknote className="h-4 w-4" />{formatSalaryRange(job.salary_min as number, job.salary_max as number)}</span>
-              <span className="flex items-center gap-1"><Users className="h-4 w-4" />{String(job.positions)} vi tri</span>
+              <span className="flex items-center gap-1"><Users className="h-4 w-4" />{String(job.positions)} vị trí</span>
               {job.address ? <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{String(job.address)}</span> : null}
               <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{new Date(job.created_at as string).toLocaleDateString('vi-VN')}</span>
             </div>
@@ -117,18 +117,18 @@ export default function JobDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Ung vien ({applications.length})
+              Ứng viên ({applications.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-3 mb-6">
-              <Badge className="bg-yellow-100 text-yellow-700">Cho xu ly: {pending.length}</Badge>
-              <Badge className="bg-green-100 text-green-700">Chap nhan: {accepted.length}</Badge>
-              <Badge className="bg-red-100 text-red-700">Tu choi: {rejected.length}</Badge>
+              <Badge className="bg-yellow-100 text-yellow-700">Chờ xử lý: {pending.length}</Badge>
+              <Badge className="bg-green-100 text-green-700">Chấp nhận: {accepted.length}</Badge>
+              <Badge className="bg-red-100 text-red-700">Từ chối: {rejected.length}</Badge>
             </div>
 
             {applications.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">Chua co ung vien nao</p>
+              <p className="text-gray-500 text-center py-8">Chưa có ứng viên nào</p>
             ) : (
               <div className="space-y-3">
                 {applications.map(app => (
@@ -138,10 +138,10 @@ export default function JobDetailPage() {
                         <User className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
-                        <p className="font-medium">{app.worker?.full_name || 'Ung vien'}</p>
+                        <p className="font-medium">{app.worker?.full_name || 'Ứng viên'}</p>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                           {app.worker?.experience_years !== undefined && (
-                            <span>{app.worker.experience_years} nam KN</span>
+                            <span>{app.worker.experience_years} năm KN</span>
                           )}
                           {app.worker?.skills && app.worker.skills.length > 0 && (
                             <span>- {app.worker.skills.slice(0, 3).join(', ')}</span>
@@ -160,7 +160,7 @@ export default function JobDetailPage() {
                             className="bg-green-600 hover:bg-green-700"
                             onClick={() => updateApplicationStatus(app.id, 'accepted')}
                           >
-                            <CheckCircle2 className="h-4 w-4 mr-1" />Nhan
+                            <CheckCircle2 className="h-4 w-4 mr-1" />Nhận
                           </Button>
                           <Button
                             size="sm"
@@ -168,7 +168,7 @@ export default function JobDetailPage() {
                             className="text-red-600 border-red-200 hover:bg-red-50"
                             onClick={() => updateApplicationStatus(app.id, 'rejected')}
                           >
-                            <XCircle className="h-4 w-4 mr-1" />Tu choi
+                            <XCircle className="h-4 w-4 mr-1" />Từ chối
                           </Button>
                         </>
                       ) : (
@@ -177,7 +177,7 @@ export default function JobDetailPage() {
                           app.status === 'rejected' ? 'bg-red-100 text-red-700' :
                           'bg-gray-100 text-gray-700'
                         }>
-                          {app.status === 'accepted' ? 'Da chap nhan' : 'Da tu choi'}
+                          {app.status === 'accepted' ? 'Đã chấp nhận' : 'Đã từ chối'}
                         </Badge>
                       )}
                     </div>

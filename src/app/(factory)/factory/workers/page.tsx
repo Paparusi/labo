@@ -78,14 +78,14 @@ export default function FactoryWorkersPage() {
     latitude: w.latitude,
     longitude: w.longitude,
     title: w.full_name,
-    subtitle: `${w.distance_km}km - ${w.skills?.slice(0, 2).join(', ') || 'Cong nhan'}`,
+    subtitle: `${w.distance_km}km - ${w.skills?.slice(0, 2).join(', ') || 'Công nhân'}`,
     type: 'worker' as const,
   }))
 
   const availLabels: Record<string, string> = {
-    immediate: 'San sang ngay',
-    one_week: '1 tuan',
-    one_month: '1 thang',
+    immediate: 'Sẵn sàng ngay',
+    one_week: '1 tuần',
+    one_month: '1 tháng',
   }
 
   return (
@@ -94,19 +94,19 @@ export default function FactoryWorkersPage() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Cong nhan gan nha may</h1>
-            <p className="text-sm text-gray-500 mt-1">Tim cong nhan phu hop trong khu vuc cua ban</p>
+            <h1 className="text-2xl font-bold text-gray-900">Công nhân gần nhà máy</h1>
+            <p className="text-sm text-gray-500 mt-1">Tìm công nhân phù hợp trong khu vực của bạn</p>
           </div>
           <div className="flex items-center gap-3">
             <Select value={availFilter} onValueChange={setAvailFilter}>
               <SelectTrigger className="w-36">
-                <SelectValue placeholder="Kha dung" />
+                <SelectValue placeholder="Khả dụng" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tat ca</SelectItem>
-                <SelectItem value="immediate">San sang ngay</SelectItem>
-                <SelectItem value="one_week">1 tuan</SelectItem>
-                <SelectItem value="one_month">1 thang</SelectItem>
+                <SelectItem value="all">Tất cả</SelectItem>
+                <SelectItem value="immediate">Sẵn sàng ngay</SelectItem>
+                <SelectItem value="one_week">1 tuần</SelectItem>
+                <SelectItem value="one_month">1 tháng</SelectItem>
               </SelectContent>
             </Select>
             <Select value={String(radius)} onValueChange={(v) => setRadius(Number(v))}>
@@ -137,7 +137,7 @@ export default function FactoryWorkersPage() {
           </div>
         </div>
 
-        <Badge variant="secondary" className="mb-4">{workers.length} cong nhan trong ban kinh {radius}km</Badge>
+        <Badge variant="secondary" className="mb-4">{workers.length} công nhân trong bán kính {radius}km</Badge>
 
         {loading ? (
           <div className="flex items-center justify-center h-32">
@@ -146,9 +146,9 @@ export default function FactoryWorkersPage() {
         ) : !factory?.latitude ? (
           <div className="text-center py-12 text-gray-500">
             <MapPin className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-            <p>Vui long cap nhat vi tri nha may trong ho so de tim cong nhan gan day</p>
+            <p>Vui lòng cập nhật vị trí nhà máy trong hồ sơ để tìm công nhân gần đây</p>
             <Button asChild className="mt-3">
-              <a href="/factory/profile">Cap nhat ho so</a>
+              <a href="/factory/profile">Cập nhật hồ sơ</a>
             </Button>
           </div>
         ) : viewMode === 'map' ? (
@@ -178,7 +178,7 @@ export default function FactoryWorkersPage() {
                           {worker.distance_km} km - {distInfo.transport}
                         </p>
                         <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                          <span>{worker.experience_years} nam KN</span>
+                          <span>{worker.experience_years} năm KN</span>
                           <span>-</span>
                           <Badge variant="outline" className="text-xs py-0">
                             {availLabels[worker.availability] || worker.availability}

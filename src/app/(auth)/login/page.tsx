@@ -29,7 +29,7 @@ export default function LoginPage() {
     })
 
     if (authError) {
-      setError('Email hoac mat khau khong dung')
+      setError('Email hoặc mật khẩu không đúng')
       setLoading(false)
       return
     }
@@ -56,7 +56,7 @@ export default function LoginPage() {
             </div>
             <span className="text-2xl font-bold text-gray-900">Labo</span>
           </Link>
-          <CardTitle className="text-2xl">Dang nhap</CardTitle>
+          <CardTitle className="text-2xl">Đăng nhập</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -77,7 +77,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <Label htmlFor="password">Mat khau</Label>
+              <Label htmlFor="password">Mật khẩu</Label>
               <Input
                 id="password"
                 type="password"
@@ -89,13 +89,13 @@ export default function LoginPage() {
             </div>
             <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Dang nhap
+              Đăng nhập
             </Button>
           </form>
           <div className="mt-6 text-center text-sm text-gray-500">
-            Chua co tai khoan?{' '}
+            Chưa có tài khoản?{' '}
             <Link href="/register" className="text-emerald-600 hover:underline font-medium">
-              Dang ky ngay
+              Đăng ký ngay
             </Link>
           </div>
         </CardContent>

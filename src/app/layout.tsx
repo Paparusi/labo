@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Labo - Tim viec gan, Tuyen dung nhanh',
-  description: 'Labo - Nen tang marketplace ket noi cong nhan voi nha may gan nhat. Tim viec nhanh, tuyen dung hieu qua dua tren vi tri dia ly.',
-  keywords: ['labo', 'tim viec', 'tuyen dung', 'cong nhan', 'nha may', 'viec lam', 'gan nha'],
+  title: 'Labo - Tìm việc gần, Tuyển dụng nhanh',
+  description: 'Labo - Nền tảng marketplace kết nối công nhân với nhà máy gần nhất. Tìm việc nhanh, tuyển dụng hiệu quả dựa trên vị trí địa lý.',
+  keywords: ['labo', 'tìm việc', 'tuyển dụng', 'công nhân', 'nhà máy', 'việc làm', 'gần nhà'],
 }
 
 export default function RootLayout({

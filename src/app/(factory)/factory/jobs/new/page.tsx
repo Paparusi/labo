@@ -21,14 +21,14 @@ const INDUSTRIES = [
 ]
 
 const INDUSTRY_LABELS: Record<string, string> = {
-  electronics: 'Dien tu', garment: 'May mac', footwear: 'Giay dep',
-  food: 'Thuc pham', furniture: 'Noi that', mechanical: 'Co khi',
-  packaging: 'Dong goi', plastics: 'Nhua', other: 'Khac',
+  electronics: 'Điện tử', garment: 'May mặc', footwear: 'Giày dép',
+  food: 'Thực phẩm', furniture: 'Nội thất', mechanical: 'Cơ khí',
+  packaging: 'Đóng gói', plastics: 'Nhựa', other: 'Khác',
 }
 
 const SKILL_OPTIONS = [
-  'May', 'Han', 'Lap rap', 'Kiem tra chat luong', 'Van hanh may',
-  'Lai xe nang', 'Dong goi', 'Han dien', 'Son', 'Dien', 'Moc',
+  'May', 'Hàn', 'Lắp ráp', 'Kiểm tra chất lượng', 'Vận hành máy',
+  'Lái xe nâng', 'Đóng gói', 'Hàn điện', 'Sơn', 'Điện', 'Mộc',
 ]
 
 export default function NewJobPage() {
@@ -125,35 +125,35 @@ export default function NewJobPage() {
     <div className="min-h-screen bg-gray-50">
       <Header user={user} />
       <div className="container mx-auto px-4 py-6 max-w-2xl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Dang tin tuyen dung</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Đăng tin tuyển dụng</h1>
 
         <form onSubmit={(e) => handleSubmit(e, 'active')} className="space-y-6">
           <Card>
-            <CardHeader><CardTitle className="text-lg">Thong tin viec lam</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg">Thông tin việc làm</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Tieu de *</Label>
+                <Label>Tiêu đề *</Label>
                 <Input
                   value={form.title}
                   onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="VD: Tuyen cong nhan lap rap dien tu"
+                  placeholder="VD: Tuyển công nhân lắp ráp điện tử"
                   required
                 />
               </div>
               <div>
-                <Label>Mo ta cong viec</Label>
+                <Label>Mô tả công việc</Label>
                 <Textarea
                   value={form.description}
                   onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Mo ta chi tiet cong viec, yeu cau, quyen loi..."
+                  placeholder="Mô tả chi tiết công việc, yêu cầu, quyền lợi..."
                   rows={4}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Nganh nghe</Label>
+                  <Label>Ngành nghề</Label>
                   <Select value={form.industry} onValueChange={(v) => setForm(prev => ({ ...prev, industry: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Chon nganh" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn ngành" /></SelectTrigger>
                     <SelectContent>
                       {INDUSTRIES.map(i => (
                         <SelectItem key={i} value={i}>{INDUSTRY_LABELS[i]}</SelectItem>
@@ -162,7 +162,7 @@ export default function NewJobPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label>So luong tuyen</Label>
+                  <Label>Số lượng tuyển</Label>
                   <Input
                     type="number"
                     min={1}
@@ -175,11 +175,11 @@ export default function NewJobPage() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-lg">Luong & Ca lam</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg">Lương & Ca làm</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Luong toi thieu (VND)</Label>
+                  <Label>Lương tối thiểu (VND)</Label>
                   <Input
                     type="number"
                     value={form.salary_min}
@@ -188,7 +188,7 @@ export default function NewJobPage() {
                   />
                 </div>
                 <div>
-                  <Label>Luong toi da (VND)</Label>
+                  <Label>Lương tối đa (VND)</Label>
                   <Input
                     type="number"
                     value={form.salary_max}
@@ -199,31 +199,31 @@ export default function NewJobPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Ca lam viec</Label>
+                  <Label>Ca làm việc</Label>
                   <Select value={form.shift_type} onValueChange={(v) => setForm(prev => ({ ...prev, shift_type: v }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="day">Ca ngay</SelectItem>
-                      <SelectItem value="night">Ca dem</SelectItem>
+                      <SelectItem value="day">Ca ngày</SelectItem>
+                      <SelectItem value="night">Ca đêm</SelectItem>
                       <SelectItem value="rotating">Ca xoay</SelectItem>
-                      <SelectItem value="flexible">Linh hoat</SelectItem>
+                      <SelectItem value="flexible">Linh hoạt</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Yeu cau gioi tinh</Label>
+                  <Label>Yêu cầu giới tính</Label>
                   <Select value={form.gender_requirement} onValueChange={(v) => setForm(prev => ({ ...prev, gender_requirement: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Khong yeu cau" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Không yêu cầu" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Khong yeu cau</SelectItem>
+                      <SelectItem value="any">Không yêu cầu</SelectItem>
                       <SelectItem value="male">Nam</SelectItem>
-                      <SelectItem value="female">Nu</SelectItem>
+                      <SelectItem value="female">Nữ</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div>
-                <Label>Ngay bat dau</Label>
+                <Label>Ngày bắt đầu</Label>
                 <Input
                   type="date"
                   value={form.start_date}
@@ -234,7 +234,7 @@ export default function NewJobPage() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-lg">Ky nang yeu cau</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg">Kỹ năng yêu cầu</CardTitle></CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2 mb-3">
                 {form.skills_required.map(skill => (
@@ -255,20 +255,20 @@ export default function NewJobPage() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-lg">Dia diem lam viec</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg">Địa điểm làm việc</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Dia chi</Label>
+                <Label>Địa chỉ</Label>
                 <Input
                   value={form.address}
                   onChange={(e) => setForm(prev => ({ ...prev, address: e.target.value }))}
-                  placeholder="Dia chi nha may..."
+                  placeholder="Địa chỉ nhà máy..."
                 />
               </div>
               <Button type="button" variant="outline" size="sm" onClick={() => {
                 if (latitude && longitude) setForm(prev => ({ ...prev, latitude, longitude }))
               }}>
-                <Navigation className="h-4 w-4 mr-2" />Dung vi tri hien tai
+                <Navigation className="h-4 w-4 mr-2" />Dùng vị trí hiện tại
               </Button>
             </CardContent>
           </Card>
@@ -281,7 +281,7 @@ export default function NewJobPage() {
               onClick={(e) => handleSubmit(e as unknown as React.FormEvent, 'draft')}
               disabled={loading}
             >
-              Luu nhap
+              Lưu nháp
             </Button>
             <Button
               type="submit"
@@ -289,7 +289,7 @@ export default function NewJobPage() {
               disabled={loading}
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-              Dang tin tuyen
+              Đăng tin tuyển
             </Button>
           </div>
         </form>

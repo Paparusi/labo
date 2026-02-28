@@ -94,8 +94,8 @@ export default function WorkerDashboard() {
         await supabase.from('notifications').insert({
           user_id: job.factory_id,
           type: 'application_received',
-          title: 'Co ung vien moi',
-          message: `Co nguoi ung tuyen vi tri "${job.title}"`,
+          title: 'Có ứng viên mới',
+          message: `Có người ứng tuyển vị trí "${job.title}"`,
           data: { job_id: jobId, worker_id: authUser.id },
         })
       }
@@ -119,19 +119,19 @@ export default function WorkerDashboard() {
         {/* Title Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Viec lam gan ban</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Việc làm gần bạn</h1>
             <p className="text-gray-500 text-sm mt-1">
               {latitude && longitude ? (
                 <span className="flex items-center gap-1">
                   <Navigation className="h-3.5 w-3.5" />
-                  Da xac dinh vi tri cua ban
+                  Đã xác định vị trí của bạn
                 </span>
               ) : geoLoading ? (
-                'Dang xac dinh vi tri...'
+                'Đang xác định vị trí...'
               ) : (
                 <span className="flex items-center gap-1 text-amber-600">
                   <AlertCircle className="h-3.5 w-3.5" />
-                  {geoError || 'Cho phep truy cap vi tri de xem viec lam gan ban'}
+                  {geoError || 'Cho phép truy cập vị trí để xem việc làm gần bạn'}
                 </span>
               )}
             </p>
@@ -176,7 +176,7 @@ export default function WorkerDashboard() {
         {/* Job count */}
         <div className="mb-4">
           <Badge variant="secondary" className="text-sm">
-            {jobs.length} viec lam trong ban kinh {radius}km
+            {jobs.length} việc làm trong bán kính {radius}km
           </Badge>
         </div>
 
@@ -208,9 +208,9 @@ export default function WorkerDashboard() {
               ) : jobs.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                   <MapPin className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                  <p>Khong co viec lam nao trong ban kinh {radius}km</p>
+                  <p>Không có việc làm nào trong bán kính {radius}km</p>
                   <Button variant="outline" className="mt-3" onClick={() => setRadius(prev => Math.min(prev + 5, 20))}>
-                    Mo rong ban kinh
+                    Mở rộng bán kính
                   </Button>
                 </div>
               ) : (
@@ -234,7 +234,7 @@ export default function WorkerDashboard() {
               </div>
             ) : jobs.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                <p>Khong co viec lam nao trong ban kinh {radius}km</p>
+                <p>Không có việc làm nào trong bán kính {radius}km</p>
               </div>
             ) : (
               jobs.map(job => (

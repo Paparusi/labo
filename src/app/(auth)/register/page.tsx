@@ -59,7 +59,7 @@ function RegisterPage() {
     }
 
     if (!data.user) {
-      setError('Khong the tao tai khoan')
+      setError('Không thể tạo tài khoản')
       setLoading(false)
       return
     }
@@ -114,8 +114,8 @@ function RegisterPage() {
               </div>
               <span className="text-2xl font-bold text-gray-900">Labo</span>
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Dang ky tai khoan</h1>
-            <p className="text-gray-600 mt-2">Chon vai tro cua ban</p>
+            <h1 className="text-3xl font-bold text-gray-900">Đăng ký tài khoản</h1>
+            <p className="text-gray-600 mt-2">Chọn vai trò của bạn</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -128,10 +128,10 @@ function RegisterPage() {
                 <div className="h-16 w-16 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
                   <Users className="h-8 w-8 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Cong nhan</h3>
-                <p className="text-gray-600 text-sm">Tim viec lam gan nha. Hoan toan mien phi, khong mat phi.</p>
+                <h3 className="text-xl font-semibold mb-2">Công nhân</h3>
+                <p className="text-gray-600 text-sm">Tìm việc làm gần nhà. Hoàn toàn miễn phí, không mất phí.</p>
                 <Button className="mt-4 bg-blue-600 hover:bg-blue-700">
-                  Dang ky Cong nhan <ArrowRight className="ml-2 h-4 w-4" />
+                  Đăng ký Công nhân <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
@@ -145,18 +145,18 @@ function RegisterPage() {
                 <div className="h-16 w-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
                   <Building2 className="h-8 w-8 text-amber-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Nha may / Doanh nghiep</h3>
-                <p className="text-gray-600 text-sm">Tuyen dung nhanh. Dung thu mien phi 1 thang.</p>
+                <h3 className="text-xl font-semibold mb-2">Nhà máy / Doanh nghiệp</h3>
+                <p className="text-gray-600 text-sm">Tuyển dụng nhanh. Dùng thử miễn phí 1 tháng.</p>
                 <Button className="mt-4 bg-amber-600 hover:bg-amber-700">
-                  Dang ky Nha may <ArrowRight className="ml-2 h-4 w-4" />
+                  Đăng ký Nhà máy <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
           </div>
 
           <p className="text-center mt-6 text-sm text-gray-500">
-            Da co tai khoan?{' '}
-            <Link href="/login" className="text-emerald-600 hover:underline font-medium">Dang nhap</Link>
+            Đã có tài khoản?{' '}
+            <Link href="/login" className="text-emerald-600 hover:underline font-medium">Đăng nhập</Link>
           </p>
         </div>
       </div>
@@ -173,10 +173,10 @@ function RegisterPage() {
             </div>
           </Link>
           <CardTitle className="text-2xl">
-            Dang ky {role === 'factory' ? 'Nha may' : 'Cong nhan'}
+            Đăng ký {role === 'factory' ? 'Nhà máy' : 'Công nhân'}
           </CardTitle>
           {role === 'factory' && (
-            <p className="text-sm text-emerald-600 font-medium">Dung thu mien phi 1 thang</p>
+            <p className="text-sm text-emerald-600 font-medium">Dùng thử miễn phí 1 tháng</p>
           )}
         </CardHeader>
         <CardContent>
@@ -186,18 +186,18 @@ function RegisterPage() {
             )}
             <div>
               <Label htmlFor="name">
-                {role === 'factory' ? 'Ten cong ty' : 'Ho va ten'}
+                {role === 'factory' ? 'Tên công ty' : 'Họ và tên'}
               </Label>
               <Input
                 id="name"
-                placeholder={role === 'factory' ? 'Cong ty TNHH ABC' : 'Nguyen Van A'}
+                placeholder={role === 'factory' ? 'Công ty TNHH ABC' : 'Nguyễn Văn A'}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
             <div>
-              <Label htmlFor="phone">So dien thoai</Label>
+              <Label htmlFor="phone">Số điện thoại</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -218,11 +218,11 @@ function RegisterPage() {
               />
             </div>
             <div>
-              <Label htmlFor="password">Mat khau</Label>
+              <Label htmlFor="password">Mật khẩu</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="It nhat 6 ky tu"
+                placeholder="Ít nhất 6 ký tự"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -231,7 +231,7 @@ function RegisterPage() {
             </div>
             <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Dang ky
+              Đăng ký
             </Button>
           </form>
           <div className="mt-4 flex justify-between text-sm text-gray-500">
@@ -239,10 +239,10 @@ function RegisterPage() {
               onClick={() => setStep('select')}
               className="text-emerald-600 hover:underline"
             >
-              Doi vai tro
+              Đổi vai trò
             </button>
             <Link href="/login" className="text-emerald-600 hover:underline">
-              Da co tai khoan?
+              Đã có tài khoản?
             </Link>
           </div>
         </CardContent>

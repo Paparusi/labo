@@ -52,10 +52,10 @@ export default function NotificationsPage() {
       <Header user={user} unreadNotifications={unreadCount} />
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Thong bao</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Thông báo</h1>
           {unreadCount > 0 && (
             <Button variant="ghost" size="sm" onClick={markAllRead}>
-              <CheckCheck className="h-4 w-4 mr-2" />Danh dau tat ca da doc
+              <CheckCheck className="h-4 w-4 mr-2" />Đánh dấu tất cả đã đọc
             </Button>
           )}
         </div>
@@ -63,7 +63,7 @@ export default function NotificationsPage() {
         {notifications.length === 0 ? (
           <div className="text-center py-16 text-gray-500">
             <Bell className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-            <p>Chua co thong bao nao</p>
+            <p>Chưa có thông báo nào</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -84,7 +84,7 @@ export default function NotificationsPage() {
                         <h3 className={`font-medium text-sm ${!n.is_read ? 'text-gray-900' : 'text-gray-600'}`}>
                           {n.title}
                         </h3>
-                        {!n.is_read && <Badge className="bg-emerald-600 text-white text-[10px] px-1.5 py-0">Moi</Badge>}
+                        {!n.is_read && <Badge className="bg-emerald-600 text-white text-[10px] px-1.5 py-0">Mới</Badge>}
                       </div>
                       <p className="text-sm text-gray-500 mt-0.5">{n.message}</p>
                       <p className="text-xs text-gray-400 mt-1">

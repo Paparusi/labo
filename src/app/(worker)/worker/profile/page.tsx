@@ -15,9 +15,9 @@ import { useGeolocation } from '@/hooks/useGeolocation'
 import type { User, WorkerProfile } from '@/types'
 
 const SKILL_OPTIONS = [
-  'May', 'Han', 'Lap rap', 'Kiem tra chat luong', 'Van hanh may',
-  'Lai xe nang', 'Dong goi', 'Han dien', 'Son', 'Dien', 'Moc',
-  'In an', 'Cat', 'CNC', 'Bao tri',
+  'May', 'Hàn', 'Lắp ráp', 'Kiểm tra chất lượng', 'Vận hành máy',
+  'Lái xe nâng', 'Đóng gói', 'Hàn điện', 'Sơn', 'Điện', 'Mộc',
+  'In ấn', 'Cắt', 'CNC', 'Bảo trì',
 ]
 
 export default function WorkerProfilePage() {
@@ -105,17 +105,17 @@ export default function WorkerProfilePage() {
     <div className="min-h-screen bg-gray-50">
       <Header user={user} />
       <div className="container mx-auto px-4 py-6 max-w-2xl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Ho so cua toi</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Hồ sơ của tôi</h1>
 
         <div className="space-y-6">
           {/* Basic Info */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Thong tin ca nhan</CardTitle>
+              <CardTitle className="text-lg">Thông tin cá nhân</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Ho va ten</Label>
+                <Label>Họ và tên</Label>
                 <Input
                   value={profile.full_name || ''}
                   onChange={(e) => setProfile(prev => ({ ...prev, full_name: e.target.value }))}
@@ -123,7 +123,7 @@ export default function WorkerProfilePage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Ngay sinh</Label>
+                  <Label>Ngày sinh</Label>
                   <Input
                     type="date"
                     value={profile.date_of_birth || ''}
@@ -131,26 +131,26 @@ export default function WorkerProfilePage() {
                   />
                 </div>
                 <div>
-                  <Label>Gioi tinh</Label>
+                  <Label>Giới tính</Label>
                   <Select
                     value={profile.gender || ''}
                     onValueChange={(v) => setProfile(prev => ({ ...prev, gender: v as 'male' | 'female' | 'other' }))}
                   >
-                    <SelectTrigger><SelectValue placeholder="Chon" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="male">Nam</SelectItem>
-                      <SelectItem value="female">Nu</SelectItem>
-                      <SelectItem value="other">Khac</SelectItem>
+                      <SelectItem value="female">Nữ</SelectItem>
+                      <SelectItem value="other">Khác</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div>
-                <Label>Bio / Gioi thieu ban than</Label>
+                <Label>Bio / Giới thiệu bản thân</Label>
                 <Textarea
                   value={profile.bio || ''}
                   onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
-                  placeholder="Viet vai dong gioi thieu ve ban than, kinh nghiem lam viec..."
+                  placeholder="Viết vài dòng giới thiệu về bản thân, kinh nghiệm làm việc..."
                   rows={3}
                 />
               </div>
@@ -160,21 +160,21 @@ export default function WorkerProfilePage() {
           {/* Location */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Vi tri</CardTitle>
+              <CardTitle className="text-lg">Vị trí</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Dia chi</Label>
+                <Label>Địa chỉ</Label>
                 <Input
                   value={profile.address || ''}
                   onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
-                  placeholder="So nha, duong, phuong/xa..."
+                  placeholder="Số nhà, đường, phường/xã..."
                 />
               </div>
               <div className="flex items-center gap-3">
                 <Button variant="outline" size="sm" onClick={useCurrentLocation}>
                   <Navigation className="h-4 w-4 mr-2" />
-                  Dung vi tri hien tai
+                  Dùng vị trí hiện tại
                 </Button>
                 {profile.latitude && profile.longitude && (
                   <span className="text-sm text-gray-500">
@@ -189,11 +189,11 @@ export default function WorkerProfilePage() {
           {/* Skills & Experience */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Ky nang & Kinh nghiem</CardTitle>
+              <CardTitle className="text-lg">Kỹ năng & Kinh nghiệm</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Ky nang</Label>
+                <Label>Kỹ năng</Label>
                 <div className="flex flex-wrap gap-2 mt-2 mb-3">
                   {(profile.skills || []).map(skill => (
                     <Badge key={skill} variant="secondary" className="flex items-center gap-1">
@@ -219,7 +219,7 @@ export default function WorkerProfilePage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Kinh nghiem (nam)</Label>
+                  <Label>Kinh nghiệm (năm)</Label>
                   <Input
                     type="number"
                     min={0}
@@ -228,16 +228,16 @@ export default function WorkerProfilePage() {
                   />
                 </div>
                 <div>
-                  <Label>Kha dung</Label>
+                  <Label>Khả dụng</Label>
                   <Select
                     value={profile.availability || 'immediate'}
                     onValueChange={(v) => setProfile(prev => ({ ...prev, availability: v as 'immediate' | 'one_week' | 'one_month' }))}
                   >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="immediate">San sang ngay</SelectItem>
-                      <SelectItem value="one_week">Trong 1 tuan</SelectItem>
-                      <SelectItem value="one_month">Trong 1 thang</SelectItem>
+                      <SelectItem value="immediate">Sẵn sàng ngay</SelectItem>
+                      <SelectItem value="one_week">Trong 1 tuần</SelectItem>
+                      <SelectItem value="one_month">Trong 1 tháng</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -248,7 +248,7 @@ export default function WorkerProfilePage() {
           {/* Save */}
           <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={handleSave} disabled={saving}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-            Luu ho so
+            Lưu hồ sơ
           </Button>
         </div>
       </div>

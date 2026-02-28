@@ -12,15 +12,15 @@ import { Search, Loader2, SlidersHorizontal } from 'lucide-react'
 import type { User, Job } from '@/types'
 
 const INDUSTRIES = [
-  { value: 'all', label: 'Tat ca nganh' },
-  { value: 'electronics', label: 'Dien tu' },
-  { value: 'garment', label: 'May mac' },
-  { value: 'footwear', label: 'Giay dep' },
-  { value: 'food', label: 'Thuc pham' },
-  { value: 'furniture', label: 'Noi that' },
-  { value: 'mechanical', label: 'Co khi' },
-  { value: 'packaging', label: 'Dong goi' },
-  { value: 'plastics', label: 'Nhua' },
+  { value: 'all', label: 'Tất cả ngành' },
+  { value: 'electronics', label: 'Điện tử' },
+  { value: 'garment', label: 'May mặc' },
+  { value: 'footwear', label: 'Giày dép' },
+  { value: 'food', label: 'Thực phẩm' },
+  { value: 'furniture', label: 'Nội thất' },
+  { value: 'mechanical', label: 'Cơ khí' },
+  { value: 'packaging', label: 'Đóng gói' },
+  { value: 'plastics', label: 'Nhựa' },
 ]
 
 export default function WorkerJobsPage() {
@@ -141,7 +141,7 @@ export default function WorkerJobsPage() {
     <div className="min-h-screen bg-gray-50">
       <Header user={user} />
       <div className="container mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Tim viec lam</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Tìm việc làm</h1>
 
         {/* Filters */}
         <div className="bg-white p-4 rounded-xl border mb-6">
@@ -149,7 +149,7 @@ export default function WorkerJobsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Tim theo ten viec, cong ty..."
+                placeholder="Tìm theo tên việc, công ty..."
                 className="pl-10"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -157,7 +157,7 @@ export default function WorkerJobsPage() {
             </div>
             <Select value={industry} onValueChange={setIndustry}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="Nganh nghe" />
+                <SelectValue placeholder="Ngành nghề" />
               </SelectTrigger>
               <SelectContent>
                 {INDUSTRIES.map(i => (
@@ -167,14 +167,14 @@ export default function WorkerJobsPage() {
             </Select>
             <Select value={shiftFilter} onValueChange={setShiftFilter}>
               <SelectTrigger className="w-36">
-                <SelectValue placeholder="Ca lam" />
+                <SelectValue placeholder="Ca làm" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tat ca ca</SelectItem>
-                <SelectItem value="day">Ca ngay</SelectItem>
-                <SelectItem value="night">Ca dem</SelectItem>
+                <SelectItem value="all">Tất cả ca</SelectItem>
+                <SelectItem value="day">Ca ngày</SelectItem>
+                <SelectItem value="night">Ca đêm</SelectItem>
                 <SelectItem value="rotating">Ca xoay</SelectItem>
-                <SelectItem value="flexible">Linh hoat</SelectItem>
+                <SelectItem value="flexible">Linh hoạt</SelectItem>
               </SelectContent>
             </Select>
             {latitude && longitude && (
@@ -194,7 +194,7 @@ export default function WorkerJobsPage() {
         </div>
 
         <Badge variant="secondary" className="mb-4">
-          {jobs.length} viec lam
+          {jobs.length} việc làm
         </Badge>
 
         {/* Job List */}
@@ -206,8 +206,8 @@ export default function WorkerJobsPage() {
           ) : jobs.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <SlidersHorizontal className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-              <p>Khong tim thay viec lam phu hop</p>
-              <p className="text-sm mt-1">Thu thay doi bo loc hoac mo rong ban kinh</p>
+              <p>Không tìm thấy việc làm phù hợp</p>
+              <p className="text-sm mt-1">Thử thay đổi bộ lọc hoặc mở rộng bán kính</p>
             </div>
           ) : (
             jobs.map(job => (

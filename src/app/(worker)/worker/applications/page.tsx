@@ -12,10 +12,10 @@ import { formatSalaryRange } from '@/lib/geo'
 import type { User, Application } from '@/types'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pending: { label: 'Cho xu ly', color: 'bg-yellow-100 text-yellow-700' },
-  accepted: { label: 'Da chap nhan', color: 'bg-green-100 text-green-700' },
-  rejected: { label: 'Tu choi', color: 'bg-red-100 text-red-700' },
-  withdrawn: { label: 'Da rut', color: 'bg-gray-100 text-gray-700' },
+  pending: { label: 'Chờ xử lý', color: 'bg-yellow-100 text-yellow-700' },
+  accepted: { label: 'Đã chấp nhận', color: 'bg-green-100 text-green-700' },
+  rejected: { label: 'Từ chối', color: 'bg-red-100 text-red-700' },
+  withdrawn: { label: 'Đã rút', color: 'bg-gray-100 text-gray-700' },
 }
 
 export default function WorkerApplicationsPage() {
@@ -66,7 +66,7 @@ export default function WorkerApplicationsPage() {
     <div className="min-h-screen bg-gray-50">
       <Header user={user} />
       <div className="container mx-auto px-4 py-6 max-w-3xl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Don ung tuyen cua toi</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Đơn ứng tuyển của tôi</h1>
 
         {loading ? (
           <div className="flex items-center justify-center h-32">
@@ -75,16 +75,16 @@ export default function WorkerApplicationsPage() {
         ) : (
           <Tabs defaultValue="all">
             <TabsList className="mb-4">
-              <TabsTrigger value="all">Tat ca ({applications.length})</TabsTrigger>
-              <TabsTrigger value="pending">Cho xu ly ({filterByStatus('pending').length})</TabsTrigger>
-              <TabsTrigger value="accepted">Chap nhan ({filterByStatus('accepted').length})</TabsTrigger>
-              <TabsTrigger value="rejected">Tu choi ({filterByStatus('rejected').length})</TabsTrigger>
+              <TabsTrigger value="all">Tất cả ({applications.length})</TabsTrigger>
+              <TabsTrigger value="pending">Chờ xử lý ({filterByStatus('pending').length})</TabsTrigger>
+              <TabsTrigger value="accepted">Chấp nhận ({filterByStatus('accepted').length})</TabsTrigger>
+              <TabsTrigger value="rejected">Từ chối ({filterByStatus('rejected').length})</TabsTrigger>
             </TabsList>
 
             {['all', 'pending', 'accepted', 'rejected'].map(tab => (
               <TabsContent key={tab} value={tab} className="space-y-3">
                 {filterByStatus(tab).length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">Khong co don ung tuyen nao</div>
+                  <div className="text-center py-12 text-gray-500">Không có đơn ứng tuyển nào</div>
                 ) : (
                   filterByStatus(tab).map(app => (
                     <Card key={app.id} className="hover:shadow-md transition-shadow">
@@ -96,7 +96,7 @@ export default function WorkerApplicationsPage() {
                                 <Building2 className="h-4 w-4 text-amber-700" />
                               </div>
                               <span className="text-sm text-gray-500">
-                                {app.job?.factory?.company_name || 'Nha may'}
+                                {app.job?.factory?.company_name || 'Nhà máy'}
                               </span>
                             </div>
                             <h3 className="font-semibold text-gray-900">{app.job?.title}</h3>
@@ -122,7 +122,7 @@ export default function WorkerApplicationsPage() {
                             </Badge>
                             {app.status === 'pending' && (
                               <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleWithdraw(app.id)}>
-                                Rut don
+                                Rút đơn
                               </Button>
                             )}
                           </div>

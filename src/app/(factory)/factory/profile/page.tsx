@@ -14,15 +14,15 @@ import { useGeolocation } from '@/hooks/useGeolocation'
 import type { User, FactoryProfile } from '@/types'
 
 const INDUSTRIES = [
-  { value: 'electronics', label: 'Dien tu' },
-  { value: 'garment', label: 'May mac' },
-  { value: 'footwear', label: 'Giay dep' },
-  { value: 'food', label: 'Thuc pham' },
-  { value: 'furniture', label: 'Noi that' },
-  { value: 'mechanical', label: 'Co khi' },
-  { value: 'packaging', label: 'Dong goi' },
-  { value: 'plastics', label: 'Nhua' },
-  { value: 'other', label: 'Khac' },
+  { value: 'electronics', label: 'Điện tử' },
+  { value: 'garment', label: 'May mặc' },
+  { value: 'footwear', label: 'Giày dép' },
+  { value: 'food', label: 'Thực phẩm' },
+  { value: 'furniture', label: 'Nội thất' },
+  { value: 'mechanical', label: 'Cơ khí' },
+  { value: 'packaging', label: 'Đóng gói' },
+  { value: 'plastics', label: 'Nhựa' },
+  { value: 'other', label: 'Khác' },
 ]
 
 export default function FactoryProfilePage() {
@@ -79,49 +79,49 @@ export default function FactoryProfilePage() {
     <div className="min-h-screen bg-gray-50">
       <Header user={user} />
       <div className="container mx-auto px-4 py-6 max-w-2xl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Ho so cong ty</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Hồ sơ công ty</h1>
 
         <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle className="text-lg">Thong tin cong ty</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg">Thông tin công ty</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Ten cong ty *</Label>
+                <Label>Tên công ty *</Label>
                 <Input value={profile.company_name || ''} onChange={(e) => setProfile(prev => ({ ...prev, company_name: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Nganh nghe</Label>
+                  <Label>Ngành nghề</Label>
                   <Select value={profile.industry || ''} onValueChange={(v) => setProfile(prev => ({ ...prev, industry: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Chon nganh" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn ngành" /></SelectTrigger>
                     <SelectContent>
                       {INDUSTRIES.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Quy mo</Label>
+                  <Label>Quy mô</Label>
                   <Select value={profile.size || 'medium'} onValueChange={(v) => setProfile(prev => ({ ...prev, size: v as 'small' | 'medium' | 'large' }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="small">Nho (&lt; 50 nguoi)</SelectItem>
-                      <SelectItem value="medium">Vua (50-200 nguoi)</SelectItem>
-                      <SelectItem value="large">Lon (&gt; 200 nguoi)</SelectItem>
+                      <SelectItem value="small">Nhỏ (&lt; 50 người)</SelectItem>
+                      <SelectItem value="medium">Vừa (50-200 người)</SelectItem>
+                      <SelectItem value="large">Lớn (&gt; 200 người)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div>
-                <Label>Mo ta cong ty</Label>
+                <Label>Mô tả công ty</Label>
                 <Textarea value={profile.description || ''} onChange={(e) => setProfile(prev => ({ ...prev, description: e.target.value }))} rows={3} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Nguoi lien he</Label>
+                  <Label>Người liên hệ</Label>
                   <Input value={profile.contact_person || ''} onChange={(e) => setProfile(prev => ({ ...prev, contact_person: e.target.value }))} />
                 </div>
                 <div>
-                  <Label>So dien thoai</Label>
+                  <Label>Số điện thoại</Label>
                   <Input value={profile.contact_phone || ''} onChange={(e) => setProfile(prev => ({ ...prev, contact_phone: e.target.value }))} />
                 </div>
               </div>
@@ -133,17 +133,17 @@ export default function FactoryProfilePage() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-lg">Vi tri nha may</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg">Vị trí nhà máy</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Dia chi</Label>
-                <Input value={profile.address || ''} onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))} placeholder="Dia chi nha may..." />
+                <Label>Địa chỉ</Label>
+                <Input value={profile.address || ''} onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))} placeholder="Địa chỉ nhà máy..." />
               </div>
               <div className="flex items-center gap-3">
                 <Button variant="outline" size="sm" onClick={() => {
                   if (latitude && longitude) setProfile(prev => ({ ...prev, latitude, longitude }))
                 }}>
-                  <Navigation className="h-4 w-4 mr-2" />Dung vi tri hien tai
+                  <Navigation className="h-4 w-4 mr-2" />Dùng vị trí hiện tại
                 </Button>
                 {profile.latitude && profile.longitude && (
                   <span className="text-sm text-gray-500">
@@ -157,7 +157,7 @@ export default function FactoryProfilePage() {
 
           <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={handleSave} disabled={saving}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-            Luu ho so
+            Lưu hồ sơ
           </Button>
         </div>
       </div>
