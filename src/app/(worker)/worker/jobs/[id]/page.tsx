@@ -78,7 +78,25 @@ export default function WorkerJobDetailPage() {
       worker_id: authUser.id,
       status: 'pending',
     })
-    if (!error) setApplied(true)
+    if (!error) {
+      setApplied(true)
+
+      // Notify factory
+      if (job) {
+        const { data: wp } = await supabase
+          .from('worker_profiles')
+          .select('full_name')
+          .eq('user_id', authUser.id)
+          .single()
+        await supabase.from('notifications').insert({
+          user_id: job.factory_id,
+          type: 'new_application',
+          title: 'Ứng viên mới',
+          message: `${wp?.full_name || 'Một công nhân'} vừa ứng tuyển vị trí "${job.title}"`,
+          data: { job_id: id },
+        })
+      }
+    }
     setApplying(false)
   }
 

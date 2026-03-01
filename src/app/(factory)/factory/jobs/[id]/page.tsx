@@ -9,9 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Users, MapPin, Banknote, Clock, CheckCircle2, XCircle, Loader2, User, MessageSquare } from 'lucide-react'
+import { ArrowLeft, Users, MapPin, Banknote, Clock, CheckCircle2, XCircle, Loader2, User, MessageSquare, Star } from 'lucide-react'
 import { formatSalaryRange } from '@/lib/geo'
 import type { User as UserType, Application, WorkerProfile } from '@/types'
+import ReviewForm from '@/components/shared/ReviewForm'
+import StarRating from '@/components/shared/StarRating'
 
 export default function JobDetailPage() {
   const { id } = useParams()
@@ -20,6 +22,7 @@ export default function JobDetailPage() {
   const [job, setJob] = useState<Record<string, unknown> | null>(null)
   const [applications, setApplications] = useState<(Application & { worker?: WorkerProfile })[]>([])
   const [loading, setLoading] = useState(true)
+  const [reviewingWorker, setReviewingWorker] = useState<string | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -64,6 +67,34 @@ export default function JobDetailPage() {
         message: `Đơn ứng tuyển vị trí "${(job as Record<string, unknown>)?.title}" đã ${status === 'accepted' ? 'được chấp nhận' : 'bị từ chối'}`,
         data: { job_id: id, application_id: appId },
       })
+
+      // Send email to worker
+      const { data: workerUser } = await supabase
+        .from('users')
+        .select('email')
+        .eq('id', app.worker_id)
+        .single()
+      const { data: factoryProfile } = await supabase
+        .from('factory_profiles')
+        .select('company_name')
+        .eq('user_id', user!.id)
+        .single()
+      if (workerUser?.email) {
+        fetch('/api/email/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'application_status',
+            data: {
+              workerEmail: workerUser.email,
+              workerName: app.worker?.full_name || 'Công nhân',
+              jobTitle: (job as Record<string, unknown>)?.title || '',
+              factoryName: factoryProfile?.company_name || 'Nhà máy',
+              status,
+            },
+          }),
+        }).catch(() => {})
+      }
     }
   }
 
@@ -192,17 +223,40 @@ export default function JobDetailPage() {
                           </Button>
                         </>
                       ) : (
-                        <Badge className={
-                          app.status === 'accepted' ? 'bg-green-100 text-green-700' :
-                          app.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                          'bg-gray-100 text-gray-700'
-                        }>
-                          {app.status === 'accepted' ? 'Đã chấp nhận' : 'Đã từ chối'}
-                        </Badge>
+                        <>
+                          {app.status === 'accepted' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-amber-600 border-amber-200 hover:bg-amber-50"
+                              onClick={() => setReviewingWorker(app.worker_id)}
+                            >
+                              <Star className="h-4 w-4 mr-1" />Đánh giá
+                            </Button>
+                          )}
+                          <Badge className={
+                            app.status === 'accepted' ? 'bg-green-100 text-green-700' :
+                            app.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                            'bg-gray-100 text-gray-700'
+                          }>
+                            {app.status === 'accepted' ? 'Đã chấp nhận' : 'Đã từ chối'}
+                          </Badge>
+                        </>
                       )}
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {reviewingWorker && (
+              <div className="mt-4 p-4 border rounded-lg bg-gray-50">
+                <h3 className="font-semibold mb-3">Đánh giá công nhân</h3>
+                <ReviewForm
+                  toUserId={reviewingWorker}
+                  jobId={id as string}
+                  onSubmitted={() => setReviewingWorker(null)}
+                />
               </div>
             )}
           </CardContent>

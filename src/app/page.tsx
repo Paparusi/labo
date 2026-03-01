@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import {
   MapPin, Briefcase, Users, Zap, Shield, BarChart3,
   ArrowRight, Check, Clock,
-  ChevronRight, Smartphone, Building2, UserCheck,
+  ChevronRight, Smartphone, Building2, UserCheck, Star,
 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 
@@ -212,6 +212,64 @@ export default function LandingPage() {
                 <h3 className="font-semibold text-lg text-gray-900">{item.title}</h3>
                 <p className="text-gray-600 mt-1">{item.desc}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge variant="secondary" className="mb-4">Đánh giá</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Người dùng nói gì?</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                name: 'Nguyễn Văn Hùng',
+                role: 'Công nhân may mặc',
+                avatar: 'H',
+                color: 'bg-blue-100 text-blue-600',
+                quote: 'Trước đây tôi mất 2 tiếng đi xe buýt đến xưởng. Nhờ Labo, tôi tìm được nhà máy cách nhà chỉ 3km. Tiết kiệm tiền và thời gian rất nhiều.',
+                rating: 5,
+              },
+              {
+                name: 'Trần Thị Mai',
+                role: 'Giám đốc nhân sự - ABC Garment',
+                avatar: 'M',
+                color: 'bg-amber-100 text-amber-600',
+                quote: 'Labo giúp chúng tôi tuyển được 50 công nhân trong 1 tuần. Tỷ lệ nghỉ việc giảm đáng kể vì họ sống gần nhà máy.',
+                rating: 5,
+              },
+              {
+                name: 'Phạm Minh Tuấn',
+                role: 'Công nhân điện tử',
+                avatar: 'T',
+                color: 'bg-green-100 text-green-600',
+                quote: 'Ứng tuyển rất nhanh, chỉ cần 1 click. Nhà máy phản hồi ngay trong ngày. Tôi có việc làm mới chỉ sau 2 ngày đăng ký.',
+                rating: 5,
+              },
+            ].map((t) => (
+              <Card key={t.name} className="border-0 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className={`h-4 w-4 ${star <= t.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                    ))}
+                  </div>
+                  <p className="text-gray-600 italic mb-6">&ldquo;{t.quote}&rdquo;</p>
+                  <div className="flex items-center gap-3">
+                    <div className={`h-10 w-10 rounded-full ${t.color} flex items-center justify-center font-semibold`}>
+                      {t.avatar}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
+                      <p className="text-gray-500 text-xs">{t.role}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>

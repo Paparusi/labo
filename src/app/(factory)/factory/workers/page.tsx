@@ -13,6 +13,7 @@ import { MapPin, List, Loader2, User, Star, MessageSquare } from 'lucide-react'
 import { getDistanceLabel } from '@/lib/geo'
 import { getMaxRadius } from '@/lib/subscription'
 import type { User as UserType, FactoryProfile, SubscriptionPlan } from '@/types'
+import StarRating from '@/components/shared/StarRating'
 
 interface NearbyWorker {
   id: string
@@ -39,6 +40,7 @@ export default function FactoryWorkersPage() {
   const [radius, setRadius] = useState(10)
   const [availFilter, setAvailFilter] = useState('all')
   const [maxRadius, setMaxRadius] = useState(50)
+  const [ratings, setRatings] = useState<Record<string, {avg_rating: number, review_count: number}>>({})
   const supabase = createClient()
 
   useEffect(() => {
@@ -81,6 +83,20 @@ export default function FactoryWorkersPage() {
         filtered = filtered.filter(w => w.availability === availFilter)
       }
       setWorkers(filtered)
+
+      // Fetch ratings for all workers
+      const ratingsData: Record<string, {avg_rating: number, review_count: number}> = {}
+      await Promise.all(
+        filtered.map(async (worker) => {
+          const { data: ratingData } = await supabase.rpc('get_user_avg_rating', {
+            p_user_id: worker.user_id
+          })
+          if (ratingData) {
+            ratingsData[worker.user_id] = ratingData
+          }
+        })
+      )
+      setRatings(ratingsData)
     }
     setLoading(false)
   }, [factory, radius, availFilter, supabase])
@@ -200,6 +216,14 @@ export default function FactoryWorkersPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-gray-900">{worker.full_name}</h3>
+                        {ratings[worker.user_id] && ratings[worker.user_id].review_count > 0 && (
+                          <div className="flex items-center gap-1 mb-1">
+                            <StarRating rating={ratings[worker.user_id].avg_rating} size="sm" />
+                            <span className="text-xs text-gray-500">
+                              ({ratings[worker.user_id].review_count})
+                            </span>
+                          </div>
+                        )}
                         <p className={`text-sm ${distInfo.color} font-medium`}>
                           <MapPin className="h-3.5 w-3.5 inline mr-1" />
                           {worker.distance_km} km - {distInfo.transport}
