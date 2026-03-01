@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin, Loader2, CheckCircle2 } from 'lucide-react'
+import { MapPin, Loader2, CheckCircle2, Eye, EyeOff } from 'lucide-react'
 
 export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -24,16 +25,14 @@ export default function ResetPasswordPage() {
     setLoading(true)
     setError('')
 
-    // Validate passwords match
-    if (newPassword !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp')
+    if (newPassword.length < 8) {
+      setError('Mật khẩu phải có ít nhất 8 ký tự')
       setLoading(false)
       return
     }
 
-    // Validate minimum length
-    if (newPassword.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự')
+    if (newPassword !== confirmPassword) {
+      setError('Mật khẩu xác nhận không khớp')
       setLoading(false)
       return
     }
@@ -43,7 +42,7 @@ export default function ResetPasswordPage() {
     })
 
     if (updateError) {
-      setError('Không thể đặt lại mật khẩu. Vui lòng thử lại.')
+      setError('Không thể đặt lại mật khẩu. Link có thể đã hết hạn, vui lòng thử lại.')
       setLoading(false)
       return
     }
@@ -51,10 +50,9 @@ export default function ResetPasswordPage() {
     setSuccess(true)
     setLoading(false)
 
-    // Redirect to login after 2 seconds
     setTimeout(() => {
       router.push('/login')
-    }, 2000)
+    }, 3000)
   }
 
   return (
@@ -74,11 +72,22 @@ export default function ResetPasswordPage() {
             <div className="space-y-4">
               <div className="bg-green-50 text-green-700 text-sm p-4 rounded-lg flex items-start gap-3">
                 <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <p>Đã đặt lại mật khẩu thành công! Đang chuyển hướng...</p>
+                <div>
+                  <p className="font-medium">Đặt lại mật khẩu thành công!</p>
+                  <p className="mt-1">Đang chuyển về trang đăng nhập...</p>
+                </div>
               </div>
+              <Link href="/login">
+                <Button variant="outline" className="w-full">
+                  Đăng nhập ngay
+                </Button>
+              </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              <p className="text-sm text-gray-500 text-center mb-2">
+                Nhập mật khẩu mới cho tài khoản của bạn
+              </p>
               {error && (
                 <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg">
                   {error}
@@ -86,21 +95,31 @@ export default function ResetPasswordPage() {
               )}
               <div>
                 <Label htmlFor="newPassword">Mật khẩu mới</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="newPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Ít nhất 8 ký tự"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={8}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
               <div>
                 <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
                 <Input
                   id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Nhập lại mật khẩu mới"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -110,6 +129,11 @@ export default function ResetPasswordPage() {
                 {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Đặt lại mật khẩu
               </Button>
+              <div className="text-center">
+                <Link href="/login" className="text-sm text-emerald-600 hover:underline">
+                  Quay lại đăng nhập
+                </Link>
+              </div>
             </form>
           )}
         </CardContent>

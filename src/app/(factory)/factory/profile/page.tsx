@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Save, Loader2, Navigation, MapPin, Building2 } from 'lucide-react'
 import ImageUpload from '@/components/shared/ImageUpload'
+import ChangePassword from '@/components/shared/ChangePassword'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import type { User, FactoryProfile } from '@/types'
 
@@ -175,6 +176,9 @@ export default function FactoryProfilePage() {
             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
             Lưu hồ sơ
           </Button>
+
+          {/* Change Password */}
+          <ChangePassword />
         </div>
       </div>
     </div>
