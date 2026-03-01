@@ -257,8 +257,10 @@ export default function LandingPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-white mb-3">Liên hệ</h4>
+              <h4 className="font-semibold text-white mb-3">Hỗ trợ</h4>
               <ul className="space-y-2 text-sm">
+                <li><Link href="/terms" className="hover:text-white">Điều khoản dịch vụ</Link></li>
+                <li><Link href="/privacy" className="hover:text-white">Chính sách bảo mật</Link></li>
                 <li>Email: support@labo.vn</li>
                 <li>Hotline: 1900-xxxx</li>
               </ul>

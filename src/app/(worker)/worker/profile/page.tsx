@@ -10,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { MapPin, Save, Loader2, Plus, X, Navigation } from 'lucide-react'
+import { MapPin, Save, Loader2, Plus, X, Navigation, User as UserIcon } from 'lucide-react'
+import ImageUpload from '@/components/shared/ImageUpload'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import type { User, WorkerProfile } from '@/types'
 
@@ -63,6 +64,7 @@ export default function WorkerProfilePage() {
         experience_years: profile.experience_years || 0,
         availability: profile.availability || 'immediate',
         bio: profile.bio,
+        avatar_url: profile.avatar_url,
       }, { onConflict: 'user_id' })
 
     setSaving(false)
@@ -114,6 +116,20 @@ export default function WorkerProfilePage() {
               <CardTitle className="text-lg">Thông tin cá nhân</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <ImageUpload
+                  bucket="avatars"
+                  currentUrl={profile.avatar_url || null}
+                  onUpload={(url) => setProfile(prev => ({ ...prev, avatar_url: url || null }))}
+                  size="lg"
+                  shape="circle"
+                  placeholder={<UserIcon className="h-8 w-8 text-gray-400" />}
+                />
+                <div>
+                  <p className="font-medium text-gray-900">Ảnh đại diện</p>
+                  <p className="text-sm text-gray-500">Nhấn vào ảnh để thay đổi</p>
+                </div>
+              </div>
               <div>
                 <Label>Họ và tên</Label>
                 <Input

@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Save, Loader2, Navigation, MapPin } from 'lucide-react'
+import { Save, Loader2, Navigation, MapPin, Building2 } from 'lucide-react'
+import ImageUpload from '@/components/shared/ImageUpload'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import type { User, FactoryProfile } from '@/types'
 
@@ -62,6 +63,7 @@ export default function FactoryProfilePage() {
       contact_phone: profile.contact_phone,
       description: profile.description,
       website: profile.website,
+      logo_url: profile.logo_url,
     }, { onConflict: 'user_id' })
     setSaving(false)
   }
@@ -85,6 +87,20 @@ export default function FactoryProfilePage() {
           <Card>
             <CardHeader><CardTitle className="text-lg">Thông tin công ty</CardTitle></CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <ImageUpload
+                  bucket="logos"
+                  currentUrl={profile.logo_url || null}
+                  onUpload={(url) => setProfile(prev => ({ ...prev, logo_url: url || null }))}
+                  size="lg"
+                  shape="square"
+                  placeholder={<Building2 className="h-8 w-8 text-gray-400" />}
+                />
+                <div>
+                  <p className="font-medium text-gray-900">Logo công ty</p>
+                  <p className="text-sm text-gray-500">Nhấn vào logo để thay đổi</p>
+                </div>
+              </div>
               <div>
                 <Label>Tên công ty *</Label>
                 <Input value={profile.company_name || ''} onChange={(e) => setProfile(prev => ({ ...prev, company_name: e.target.value }))} />
