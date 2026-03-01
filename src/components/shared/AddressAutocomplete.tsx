@@ -43,16 +43,10 @@ export default function AddressAutocomplete({
       return
     }
 
-    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-    if (!token) return
-
     const controller = new AbortController()
     setLoading(true)
 
-    fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(debouncedValue)}.json?access_token=${token}&country=vn&language=vi&limit=5&types=address,place,locality,neighborhood`,
-      { signal: controller.signal }
-    )
+    fetch(`/api/geocode?q=${encodeURIComponent(debouncedValue)}`, { signal: controller.signal })
       .then(res => res.json())
       .then(data => {
         if (data.features) {
