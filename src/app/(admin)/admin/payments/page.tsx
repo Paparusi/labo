@@ -41,7 +41,7 @@ export default function AdminPaymentsPage() {
       .from('payments')
       .select(`
         *,
-        factory_profile:factory_profiles!payments_factory_id_fkey(company_name)
+        factory_profile:factory_profiles!payments_factory_profile_fkey(company_name)
       `)
       .order('created_at', { ascending: false })
       .limit(100)
