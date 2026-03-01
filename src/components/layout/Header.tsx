@@ -13,15 +13,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Bell, Menu, X, MapPin, User, LogOut, Building2, Briefcase, ChevronDown } from 'lucide-react'
+import { Bell, Menu, X, MapPin, User, LogOut, Building2, Briefcase, ChevronDown, MessageSquare } from 'lucide-react'
 import type { User as UserType } from '@/types'
 
 interface HeaderProps {
   user: UserType | null
   unreadNotifications?: number
+  unreadMessages?: number
 }
 
-export default function Header({ user, unreadNotifications = 0 }: HeaderProps) {
+export default function Header({ user, unreadNotifications = 0, unreadMessages = 0 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -61,6 +62,9 @@ export default function Header({ user, unreadNotifications = 0 }: HeaderProps) {
                 <Link href="/worker/applications" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
                   Đơn ứng tuyển
                 </Link>
+                <Link href="/worker/messages" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                  Tin nhắn
+                </Link>
               </>
             ) : (
               <>
@@ -72,6 +76,9 @@ export default function Header({ user, unreadNotifications = 0 }: HeaderProps) {
                 </Link>
                 <Link href="/factory/workers" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
                   Tìm công nhân
+                </Link>
+                <Link href="/factory/messages" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                  Tin nhắn
                 </Link>
               </>
             )}
@@ -91,6 +98,16 @@ export default function Header({ user, unreadNotifications = 0 }: HeaderProps) {
         <div className="flex items-center gap-3">
           {user ? (
             <>
+              {/* Messages */}
+              <Link href={`/${user.role}/messages`} className="relative p-2 text-gray-600 hover:text-emerald-600">
+                <MessageSquare className="h-5 w-5" />
+                {unreadMessages > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] bg-red-500">
+                    {unreadMessages > 9 ? '9+' : unreadMessages}
+                  </Badge>
+                )}
+              </Link>
+
               {/* Notifications */}
               <Link href={`/${user.role}/notifications`} className="relative p-2 text-gray-600 hover:text-emerald-600">
                 <Bell className="h-5 w-5" />
@@ -167,6 +184,7 @@ export default function Header({ user, unreadNotifications = 0 }: HeaderProps) {
                   <Link href="/worker/dashboard" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Bản đồ việc làm</Link>
                   <Link href="/worker/jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tìm việc</Link>
                   <Link href="/worker/applications" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Đơn ứng tuyển</Link>
+                  <Link href="/worker/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tin nhắn</Link>
                   <Link href="/worker/profile" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Hồ sơ</Link>
                 </>
               ) : (
@@ -174,6 +192,7 @@ export default function Header({ user, unreadNotifications = 0 }: HeaderProps) {
                   <Link href="/factory/dashboard" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Bảng điều khiển</Link>
                   <Link href="/factory/jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tin tuyển dụng</Link>
                   <Link href="/factory/workers" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tìm công nhân</Link>
+                  <Link href="/factory/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tin nhắn</Link>
                   <Link href="/factory/subscription" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Gói dịch vụ</Link>
                 </>
               )}

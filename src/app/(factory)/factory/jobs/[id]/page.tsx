@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Header from '@/components/layout/Header'
@@ -9,12 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Users, MapPin, Banknote, Clock, CheckCircle2, XCircle, Loader2, User } from 'lucide-react'
+import { ArrowLeft, Users, MapPin, Banknote, Clock, CheckCircle2, XCircle, Loader2, User, MessageSquare } from 'lucide-react'
 import { formatSalaryRange } from '@/lib/geo'
 import type { User as UserType, Application, WorkerProfile } from '@/types'
 
 export default function JobDetailPage() {
   const { id } = useParams()
+  const router = useRouter()
   const [user, setUser] = useState<UserType | null>(null)
   const [job, setJob] = useState<Record<string, unknown> | null>(null)
   const [applications, setApplications] = useState<(Application & { worker?: WorkerProfile })[]>([])
@@ -63,6 +64,18 @@ export default function JobDetailPage() {
         message: `Đơn ứng tuyển vị trí "${(job as Record<string, unknown>)?.title}" đã ${status === 'accepted' ? 'được chấp nhận' : 'bị từ chối'}`,
         data: { job_id: id, application_id: appId },
       })
+    }
+  }
+
+  const handleMessage = async (workerId: string) => {
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    if (!authUser) return
+    const { data: convId } = await supabase.rpc('get_or_create_conversation', {
+      user_a: authUser.id,
+      user_b: workerId,
+    })
+    if (convId) {
+      router.push(`/factory/messages/${convId}`)
     }
   }
 
@@ -153,6 +166,13 @@ export default function JobDetailPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleMessage(app.worker_id)}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-1" />Nhắn tin
+                      </Button>
                       {app.status === 'pending' ? (
                         <>
                           <Button

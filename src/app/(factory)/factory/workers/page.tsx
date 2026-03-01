@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Header from '@/components/layout/Header'
 import MapView from '@/components/map/MapView'
@@ -8,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { MapPin, List, Loader2, User, Star } from 'lucide-react'
+import { MapPin, List, Loader2, User, Star, MessageSquare } from 'lucide-react'
 import { getDistanceLabel } from '@/lib/geo'
 import type { User as UserType, FactoryProfile } from '@/types'
 
@@ -28,6 +29,7 @@ interface NearbyWorker {
 }
 
 export default function FactoryWorkersPage() {
+  const router = useRouter()
   const [user, setUser] = useState<UserType | null>(null)
   const [factory, setFactory] = useState<FactoryProfile | null>(null)
   const [workers, setWorkers] = useState<NearbyWorker[]>([])
@@ -81,6 +83,18 @@ export default function FactoryWorkersPage() {
     subtitle: `${w.distance_km}km - ${w.skills?.slice(0, 2).join(', ') || 'Công nhân'}`,
     type: 'worker' as const,
   }))
+
+  const handleMessage = async (workerId: string) => {
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    if (!authUser) return
+    const { data: convId } = await supabase.rpc('get_or_create_conversation', {
+      user_a: authUser.id,
+      user_b: workerId,
+    })
+    if (convId) {
+      router.push(`/factory/messages/${convId}`)
+    }
+  }
 
   const availLabels: Record<string, string> = {
     immediate: 'Sẵn sàng ngay',
@@ -191,6 +205,14 @@ export default function FactoryWorkersPage() {
                             ))}
                           </div>
                         )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-3 w-full"
+                          onClick={() => handleMessage(worker.user_id)}
+                        >
+                          <MessageSquare className="h-4 w-4 mr-1" />Nhắn tin
+                        </Button>
                       </div>
                     </div>
                   </CardContent>

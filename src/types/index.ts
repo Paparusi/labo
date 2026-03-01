@@ -187,3 +187,26 @@ export interface MatchScore {
   rating_score: number
   total: number
 }
+
+// ==================== Chat/Messaging Types ====================
+export interface Message {
+  id: string
+  conversation_id: string
+  sender_id: string
+  receiver_id: string
+  content: string
+  is_read: boolean
+  created_at: string
+}
+
+export interface ConversationWithDetails {
+  conversation_id: string
+  other_user_id: string
+  other_user_role: UserRole
+  other_user_name: string
+  other_user_avatar: string | null
+  last_message_content: string | null
+  last_message_sender_id: string | null
+  last_message_at: string | null
+  unread_count: number
+}
