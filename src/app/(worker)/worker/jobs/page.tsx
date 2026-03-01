@@ -94,7 +94,7 @@ export default function WorkerJobsPage() {
       // No location, fetch all active jobs
       let query = supabase
         .from('jobs')
-        .select('*, factory_profiles!jobs_factory_id_fkey(company_name, logo_url)')
+        .select('*, factory_profiles!jobs_factory_profile_fkey(company_name, logo_url)')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(200)

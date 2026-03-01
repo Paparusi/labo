@@ -59,7 +59,7 @@ export default function AdminJobsPage() {
     let query = supabase
       .from('jobs')
       .select(
-        '*, factory_profiles!jobs_factory_id_fkey(company_name), applications(count)',
+        '*, factory_profiles!jobs_factory_profile_fkey(company_name), applications(count)',
         { count: 'exact' }
       )
       .order('created_at', { ascending: false })

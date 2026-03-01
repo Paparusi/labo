@@ -91,7 +91,7 @@ export default function WorkerDashboard() {
       // Recent 3 applications with job title
       const { data: recent } = await supabase
         .from('applications')
-        .select('*, jobs(title, factory_profiles!jobs_factory_id_fkey(company_name))')
+        .select('*, jobs(title, factory_profiles!jobs_factory_profile_fkey(company_name))')
         .eq('worker_id', authUser.id)
         .order('applied_at', { ascending: false })
         .limit(3)

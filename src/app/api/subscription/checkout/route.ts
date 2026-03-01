@@ -15,24 +15,24 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Vui lòng đăng nhập' }, { status: 401 })
   }
 
   const { success } = rateLimit(`checkout:${user.id}`, 5, 60_000)
   if (!success) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    return NextResponse.json({ error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau.' }, { status: 429 })
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+    return NextResponse.json({ error: 'Dữ liệu không hợp lệ' }, { status: 400 })
   }
 
   const parsed = checkoutSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json({ error: 'Yêu cầu không hợp lệ' }, { status: 400 })
   }
 
   const { plan_id, interval, amount } = parsed.data
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (payError) {
-    return NextResponse.json({ error: 'Failed to create payment' }, { status: 500 })
+    return NextResponse.json({ error: 'Không thể tạo thanh toán' }, { status: 500 })
   }
 
   // Get plan info

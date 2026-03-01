@@ -35,7 +35,7 @@ export default function WorkerApplicationsPage() {
 
       const { data } = await supabase
         .from('applications')
-        .select('*, jobs(*, factory_profiles!jobs_factory_id_fkey(company_name, logo_url, address))')
+        .select('*, jobs(*, factory_profiles!jobs_factory_profile_fkey(company_name, logo_url, address))')
         .eq('worker_id', authUser.id)
         .order('applied_at', { ascending: false })
 

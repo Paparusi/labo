@@ -117,7 +117,7 @@ export default function AdminDashboard() {
         supabase.from('subscriptions').select('*', { count: 'exact', head: true }).in('status', ['trial', 'active']),
         supabase.from('reviews').select('*', { count: 'exact', head: true }),
         supabase.from('users').select('*').order('created_at', { ascending: false }).limit(10),
-        supabase.from('jobs').select('*, factory_profiles!jobs_factory_id_fkey(company_name)').order('created_at', { ascending: false }).limit(10),
+        supabase.from('jobs').select('*, factory_profiles!jobs_factory_profile_fkey(company_name)').order('created_at', { ascending: false }).limit(10),
       ])
 
       setStats({

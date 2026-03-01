@@ -44,7 +44,7 @@ export default function FactoryDashboard() {
         supabase.from('subscriptions').select('*, subscription_plans(*)').eq('factory_id', authUser.id).order('created_at', { ascending: false }).limit(1).single(),
         supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('factory_id', authUser.id).eq('status', 'active'),
         supabase.from('applications').select('status, jobs!inner(factory_id)').eq('jobs.factory_id', authUser.id),
-        supabase.from('applications').select('*, jobs!inner(title, factory_id), worker_profiles!applications_worker_id_fkey(full_name, skills)').eq('jobs.factory_id', authUser.id).order('applied_at', { ascending: false }).limit(5),
+        supabase.from('applications').select('*, jobs!inner(title, factory_id), worker_profiles!applications_worker_profile_fkey(full_name, skills)').eq('jobs.factory_id', authUser.id).order('applied_at', { ascending: false }).limit(5),
       ])
 
       if (fpResult.data) setFactoryProfile(fpResult.data)

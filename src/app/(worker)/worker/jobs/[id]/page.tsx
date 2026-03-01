@@ -50,7 +50,7 @@ export default function WorkerJobDetailPage() {
 
       const { data: jobData } = await supabase
         .from('jobs')
-        .select('*, factory_profiles!jobs_factory_id_fkey(company_name, logo_url, industry, address, size, description, website)')
+        .select('*, factory_profiles!jobs_factory_profile_fkey(company_name, logo_url, industry, address, size, description, website)')
         .eq('id', id)
         .single()
 

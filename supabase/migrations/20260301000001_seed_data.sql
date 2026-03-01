@@ -55,10 +55,10 @@ VALUES
 -- ============================================================
 INSERT INTO subscription_plans (name, slug, price_monthly, price_yearly, max_job_posts, max_view_profiles, radius_km, features, sort_order)
 VALUES
-  ('Dung thu', 'trial', 0, 0, 5, 20, 5, '{"analytics": false, "api_access": false, "priority_support": false}', 0),
-  ('Co ban', 'basic', 2000000, 20000000, 20, 100, 10, '{"analytics": false, "api_access": false, "priority_support": false}', 1),
-  ('Chuyen nghiep', 'pro', 5000000, 50000000, 50, -1, 20, '{"analytics": true, "api_access": false, "priority_support": true}', 2),
-  ('Doanh nghiep', 'enterprise', 15000000, 150000000, -1, -1, 50, '{"analytics": true, "api_access": true, "priority_support": true}', 3)
+  ('Dùng thử', 'trial', 0, 0, 5, 20, 5, '{"analytics": false, "api_access": false, "priority_support": false}', 0),
+  ('Cơ bản', 'basic', 2000000, 20000000, 20, 100, 10, '{"analytics": false, "api_access": false, "priority_support": false}', 1),
+  ('Chuyên nghiệp', 'pro', 5000000, 50000000, 50, -1, 20, '{"analytics": true, "api_access": false, "priority_support": true}', 2),
+  ('Doanh nghiệp', 'enterprise', 15000000, 150000000, -1, -1, 50, '{"analytics": true, "api_access": true, "priority_support": true}', 3)
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   price_monthly = EXCLUDED.price_monthly,

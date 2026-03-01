@@ -34,7 +34,7 @@ export default function JobDetailPage() {
 
       const { data: appData } = await supabase
         .from('applications')
-        .select('*, worker_profiles!applications_worker_id_fkey(*)')
+        .select('*, worker_profiles!applications_worker_profile_fkey(*)')
         .eq('job_id', id)
         .order('applied_at', { ascending: false })
 

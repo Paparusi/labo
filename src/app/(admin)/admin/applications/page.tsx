@@ -61,7 +61,7 @@ export default function AdminApplicationsPage() {
     let query = supabase
       .from('applications')
       .select(
-        '*, worker_profiles!applications_worker_id_fkey(full_name), jobs!inner(title, factory_profiles!jobs_factory_id_fkey(company_name))',
+        '*, worker_profiles!applications_worker_profile_fkey(full_name), jobs!inner(title, factory_profiles!jobs_factory_profile_fkey(company_name))',
         { count: 'exact' }
       )
       .order('applied_at', { ascending: false })
