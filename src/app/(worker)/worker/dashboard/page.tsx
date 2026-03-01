@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import ProfileCompleteness from '@/components/shared/ProfileCompleteness'
 import { MapPin, List, Loader2, Navigation, AlertCircle, FileText, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { toast } from 'sonner'
 import type { User, Job, WorkerProfile, Application } from '@/types'
 
 export default function WorkerDashboard() {
@@ -30,16 +31,17 @@ export default function WorkerDashboard() {
   const { toggleSave, isSaved } = useSavedJobs()
   const supabase = createClient()
 
-  // Fetch user
+  // Fetch user + profile in parallel
   useEffect(() => {
     async function fetchUser() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        const { data } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-        setUser(data)
-
-        const { data: wpData } = await supabase.from('worker_profiles').select('*').eq('user_id', authUser.id).single()
-        if (wpData) setWorkerProfile(wpData)
+        const [userResult, wpResult] = await Promise.all([
+          supabase.from('users').select('*').eq('id', authUser.id).single(),
+          supabase.from('worker_profiles').select('*').eq('user_id', authUser.id).single(),
+        ])
+        setUser(userResult.data)
+        if (wpResult.data) setWorkerProfile(wpResult.data)
       }
     }
     fetchUser()
@@ -110,20 +112,24 @@ export default function WorkerDashboard() {
       status: 'pending',
     })
 
-    if (!error) {
-      setAppliedJobs(prev => new Set(prev).add(jobId))
+    if (error) {
+      toast.error('Ứng tuyển thất bại. Vui lòng thử lại.')
+      return
+    }
 
-      // Create notification for factory
-      const job = jobs.find(j => j.id === jobId)
-      if (job) {
-        await supabase.from('notifications').insert({
-          user_id: job.factory_id,
-          type: 'application_received',
-          title: 'Có ứng viên mới',
-          message: `Có người ứng tuyển vị trí "${job.title}"`,
-          data: { job_id: jobId, worker_id: authUser.id },
-        })
-      }
+    setAppliedJobs(prev => new Set(prev).add(jobId))
+    toast.success('Đã ứng tuyển thành công!')
+
+    // Create notification for factory
+    const job = jobs.find(j => j.id === jobId)
+    if (job) {
+      await supabase.from('notifications').insert({
+        user_id: job.factory_id,
+        type: 'application_received',
+        title: 'Có ứng viên mới',
+        message: `Có người ứng tuyển vị trí "${job.title}"`,
+        data: { job_id: jobId, worker_id: authUser.id },
+      })
     }
   }
 

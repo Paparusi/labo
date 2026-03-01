@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Search, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react'
+import { toast } from 'sonner'
 import type { User, Job } from '@/types'
 
 const INDUSTRIES = [
@@ -151,53 +152,57 @@ export default function WorkerJobsPage() {
       worker_id: authUser.id,
       status: 'pending',
     })
-    if (!error) {
-      setAppliedJobs(prev => new Set(prev).add(jobId))
+    if (error) {
+      toast.error('Ứng tuyển thất bại')
+      return
+    }
 
-      // Notify factory owner
-      const appliedJob = jobs.find(j => j.id === jobId)
-      if (appliedJob) {
-        const { data: workerProfile } = await supabase
-          .from('worker_profiles')
-          .select('full_name')
-          .eq('user_id', authUser.id)
-          .single()
+    setAppliedJobs(prev => new Set(prev).add(jobId))
+    toast.success('Đã ứng tuyển thành công!')
 
-        // In-app notification
-        await supabase.from('notifications').insert({
-          user_id: appliedJob.factory_id,
-          type: 'new_application',
-          title: 'Ứng viên mới',
-          message: `${workerProfile?.full_name || 'Một công nhân'} vừa ứng tuyển vị trí "${appliedJob.title}"`,
-          data: { job_id: jobId },
-        })
+    // Notify factory owner
+    const appliedJob = jobs.find(j => j.id === jobId)
+    if (appliedJob) {
+      const { data: workerProfile } = await supabase
+        .from('worker_profiles')
+        .select('full_name')
+        .eq('user_id', authUser.id)
+        .single()
 
-        // Email notification (fire and forget)
-        const { data: factoryUser } = await supabase
-          .from('users')
-          .select('email')
-          .eq('id', appliedJob.factory_id)
-          .single()
-        const { data: factoryProfile } = await supabase
-          .from('factory_profiles')
-          .select('company_name')
-          .eq('user_id', appliedJob.factory_id)
-          .single()
-        if (factoryUser?.email) {
-          fetch('/api/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'new_application',
-              data: {
-                factoryEmail: factoryUser.email,
-                factoryName: factoryProfile?.company_name || 'Nhà máy',
-                jobTitle: appliedJob.title,
-                workerName: workerProfile?.full_name || 'Công nhân',
-              },
-            }),
-          }).catch(() => {})
-        }
+      // In-app notification
+      await supabase.from('notifications').insert({
+        user_id: appliedJob.factory_id,
+        type: 'new_application',
+        title: 'Ứng viên mới',
+        message: `${workerProfile?.full_name || 'Một công nhân'} vừa ứng tuyển vị trí "${appliedJob.title}"`,
+        data: { job_id: jobId },
+      })
+
+      // Email notification (fire and forget)
+      const { data: factoryUser } = await supabase
+        .from('users')
+        .select('email')
+        .eq('id', appliedJob.factory_id)
+        .single()
+      const { data: factoryProfile } = await supabase
+        .from('factory_profiles')
+        .select('company_name')
+        .eq('user_id', appliedJob.factory_id)
+        .single()
+      if (factoryUser?.email) {
+        fetch('/api/email/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'new_application',
+            data: {
+              factoryEmail: factoryUser.email,
+              factoryName: factoryProfile?.company_name || 'Nhà máy',
+              jobTitle: appliedJob.title,
+              workerName: workerProfile?.full_name || 'Công nhân',
+            },
+          }),
+        }).catch(() => {})
       }
     }
   }

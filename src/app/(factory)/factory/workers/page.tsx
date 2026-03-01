@@ -48,20 +48,17 @@ export default function FactoryWorkersPage() {
     async function fetchUser() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
-      const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-      setUser(userData)
-      const { data: factoryData } = await supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single()
-      setFactory(factoryData)
 
-      // Get subscription plan to enforce radius limit
-      const { data: sub } = await supabase
-        .from('subscriptions')
-        .select('*, plan:subscription_plans(*)')
-        .eq('factory_id', authUser.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
-      const planMaxRadius = getMaxRadius(sub?.plan as SubscriptionPlan | null)
+      const [userResult, factoryResult, subResult] = await Promise.all([
+        supabase.from('users').select('*').eq('id', authUser.id).single(),
+        supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single(),
+        supabase.from('subscriptions').select('*, plan:subscription_plans(*)').eq('factory_id', authUser.id).order('created_at', { ascending: false }).limit(1).single(),
+      ])
+
+      setUser(userResult.data)
+      setFactory(factoryResult.data)
+
+      const planMaxRadius = getMaxRadius(subResult.data?.plan as SubscriptionPlan | null)
       setMaxRadius(planMaxRadius)
       setRadius(Math.min(10, planMaxRadius))
     }
@@ -85,19 +82,30 @@ export default function FactoryWorkersPage() {
       }
       setWorkers(filtered)
 
-      // Fetch ratings for all workers
-      const ratingsData: Record<string, {avg_rating: number, review_count: number}> = {}
-      await Promise.all(
-        filtered.map(async (worker) => {
-          const { data: ratingData } = await supabase.rpc('get_user_avg_rating', {
-            p_user_id: worker.user_id
+      // Batch fetch ratings: single query instead of N+1
+      if (filtered.length > 0) {
+        const userIds = filtered.map(w => w.user_id)
+        const { data: reviewsData } = await supabase
+          .from('reviews')
+          .select('to_user_id, rating')
+          .in('to_user_id', userIds)
+
+        const ratingsData: Record<string, {avg_rating: number, review_count: number}> = {}
+        if (reviewsData) {
+          const grouped: Record<string, number[]> = {}
+          reviewsData.forEach(r => {
+            if (!grouped[r.to_user_id]) grouped[r.to_user_id] = []
+            grouped[r.to_user_id].push(r.rating)
           })
-          if (ratingData) {
-            ratingsData[worker.user_id] = ratingData
-          }
-        })
-      )
-      setRatings(ratingsData)
+          Object.entries(grouped).forEach(([userId, ratings]) => {
+            ratingsData[userId] = {
+              avg_rating: ratings.reduce((a, b) => a + b, 0) / ratings.length,
+              review_count: ratings.length,
+            }
+          })
+        }
+        setRatings(ratingsData)
+      }
     }
     setLoading(false)
   }, [factory, radius, availFilter, supabase])

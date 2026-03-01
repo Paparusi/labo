@@ -50,12 +50,13 @@ export default function SavedJobsPage() {
         if (error) throw error
 
         // Transform the data to match Job type
-        const jobs = savedJobsData
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const jobs = (savedJobsData
           ?.map((item: any) => ({
             ...item.jobs,
-            factory: item.jobs.factory
+            factory: item.jobs.factory,
           }))
-          .filter((job: any) => job && job.status === 'active') || []
+          .filter((job: any) => job && job.status === 'active') || []) as Job[]
 
         setSavedJobs(jobs)
       } catch (error) {

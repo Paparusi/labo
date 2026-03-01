@@ -36,62 +36,37 @@ export default function FactoryDashboard() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
 
-      const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-      setUser(userData)
+      // Parallelize all independent queries
+      const [userResult, fpResult, subResult, jobCountResult, appResult, recentResult] = await Promise.all([
+        supabase.from('users').select('*').eq('id', authUser.id).single(),
+        supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single(),
+        supabase.from('subscriptions').select('*, subscription_plans(*)').eq('factory_id', authUser.id).order('created_at', { ascending: false }).limit(1).single(),
+        supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('factory_id', authUser.id).eq('status', 'active'),
+        supabase.from('applications').select('status, jobs!inner(factory_id)').eq('jobs.factory_id', authUser.id),
+        supabase.from('applications').select('*, jobs!inner(title, factory_id), worker_profiles!applications_worker_id_fkey(full_name, skills)').eq('jobs.factory_id', authUser.id).order('applied_at', { ascending: false }).limit(5),
+      ])
 
-      // Fetch factory profile
-      const { data: fpData } = await supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single()
-      if (fpData) setFactoryProfile(fpData)
-
-      // Fetch subscription
-      const { data: subData } = await supabase
-        .from('subscriptions')
-        .select('*, subscription_plans(*)')
-        .eq('factory_id', authUser.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
-
-      if (subData) {
-        setSubscription(subData)
-        setPlan(subData.subscription_plans)
+      setUser(userResult.data)
+      if (fpResult.data) setFactoryProfile(fpResult.data)
+      if (subResult.data) {
+        setSubscription(subResult.data)
+        setPlan(subResult.data.subscription_plans)
       }
 
-      // Stats: active jobs
-      const { count: activeJobs } = await supabase
-        .from('jobs')
-        .select('*', { count: 'exact', head: true })
-        .eq('factory_id', authUser.id)
-        .eq('status', 'active')
-
-      // Stats: applications
-      const { data: appData } = await supabase
-        .from('applications')
-        .select('status, jobs!inner(factory_id)')
-        .eq('jobs.factory_id', authUser.id)
-
+      const appData = appResult.data
       const pending = appData?.filter(a => a.status === 'pending').length || 0
       const accepted = appData?.filter(a => a.status === 'accepted').length || 0
       const rejected = appData?.filter(a => a.status === 'rejected').length || 0
 
       setStats({
-        activeJobs: activeJobs || 0,
+        activeJobs: jobCountResult.count || 0,
         totalApplications: appData?.length || 0,
         pendingApplications: pending,
         acceptedApplications: accepted,
         rejectedApplications: rejected,
       })
 
-      // Recent applications
-      const { data: recent } = await supabase
-        .from('applications')
-        .select('*, jobs!inner(title, factory_id), worker_profiles!applications_worker_id_fkey(full_name, skills)')
-        .eq('jobs.factory_id', authUser.id)
-        .order('applied_at', { ascending: false })
-        .limit(5)
-
-      if (recent) setRecentApplications(recent)
-
+      if (recentResult.data) setRecentApplications(recentResult.data)
       setLoading(false)
     }
     fetchData()
