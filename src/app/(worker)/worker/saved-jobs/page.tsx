@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/contexts/UserContext'
+
 import Header from '@/components/layout/Header'
 import JobCard from '@/components/jobs/JobCard'
 import { useSavedJobs } from '@/hooks/useSavedJobs'
@@ -11,7 +11,7 @@ import { Bookmark } from 'lucide-react'
 import type { Job } from '@/types'
 
 export default function SavedJobsPage() {
-  const { user } = useUser()
+
   const [savedJobs, setSavedJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const { toggleSave, isSaved } = useSavedJobs()
@@ -70,7 +70,7 @@ export default function SavedJobsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">

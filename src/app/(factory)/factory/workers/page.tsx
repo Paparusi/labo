@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/contexts/UserContext'
+
 import Header from '@/components/layout/Header'
 import MapView from '@/components/map/MapView'
 import { Card, CardContent } from '@/components/ui/card'
@@ -34,7 +34,6 @@ interface NearbyWorker {
 
 export default function FactoryWorkersPage() {
   const router = useRouter()
-  const { user } = useUser()
   const [factory, setFactory] = useState<FactoryProfile | null>(null)
   const [workers, setWorkers] = useState<NearbyWorker[]>([])
   const [loading, setLoading] = useState(true)
@@ -142,7 +141,7 @@ export default function FactoryWorkersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <div>

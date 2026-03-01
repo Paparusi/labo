@@ -9,10 +9,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Loader2, Crown, Calendar, AlertTriangle } from 'lucide-react'
 import { isSubscriptionActive, getTrialDaysLeft, formatPrice, getPlanBadgeColor } from '@/lib/subscription'
-import type { User, Subscription, SubscriptionPlan } from '@/types'
+import type { Subscription, SubscriptionPlan } from '@/types'
 
 export default function SubscriptionPage() {
-  const [user, setUser] = useState<User | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan | null>(null)
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
@@ -24,9 +23,6 @@ export default function SubscriptionPage() {
     async function fetchData() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
-
-      const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-      setUser(userData)
 
       // Plans
       const { data: plansData } = await supabase
@@ -92,7 +88,7 @@ export default function SubscriptionPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-emerald-600" /></div>
       </div>
     )
@@ -100,7 +96,7 @@ export default function SubscriptionPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Goi dich vu</h1>
 

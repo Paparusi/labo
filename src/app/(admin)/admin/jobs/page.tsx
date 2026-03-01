@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import AdminSidebar from '@/components/layout/AdminSidebar'
+import Header from '@/components/layout/Header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -105,10 +105,9 @@ export default function AdminJobsPage() {
   const totalPages = Math.ceil(totalCount / JOBS_PER_PAGE)
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <AdminSidebar />
-
-      <main className="flex-1 p-8">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Quản lý tin tuyển dụng</h1>
           <p className="text-gray-500 mt-1">Kiểm duyệt và quản lý tin tuyển dụng trên nền tảng</p>
@@ -260,7 +259,7 @@ export default function AdminJobsPage() {
             )}
           </CardContent>
         </Card>
-      </main>
+      </div>
     </div>
   )
 }

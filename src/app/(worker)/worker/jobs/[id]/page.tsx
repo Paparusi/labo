@@ -15,7 +15,7 @@ import {
   Calendar, Loader2, CheckCircle2, Globe, Bookmark,
 } from 'lucide-react'
 import { formatSalaryRange } from '@/lib/geo'
-import type { User, Job } from '@/types'
+import type { Job } from '@/types'
 
 const shiftLabels: Record<string, string> = {
   day: 'Ca ngày', night: 'Ca đêm', rotating: 'Ca xoay', flexible: 'Linh hoạt',
@@ -27,7 +27,6 @@ const genderLabels: Record<string, string> = {
 export default function WorkerJobDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
   const [job, setJob] = useState<Job | null>(null)
   const [loading, setLoading] = useState(true)
   const [applied, setApplied] = useState(false)
@@ -39,9 +38,6 @@ export default function WorkerJobDetailPage() {
     async function fetchData() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-        setUser(userData)
-
         // Check if already applied
         const { data: app } = await supabase
           .from('applications')
@@ -103,7 +99,7 @@ export default function WorkerJobDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
         </div>
@@ -114,7 +110,7 @@ export default function WorkerJobDetailPage() {
   if (!job) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <div className="container mx-auto px-4 py-12 text-center">
           <p className="text-gray-500">Không tìm thấy việc làm</p>
           <Button asChild className="mt-4"><Link href="/worker/jobs">Quay lại</Link></Button>
@@ -127,7 +123,7 @@ export default function WorkerJobDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6 max-w-3xl">
         <Button variant="ghost" size="sm" className="mb-4" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4 mr-1" />Quay lại

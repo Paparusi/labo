@@ -14,7 +14,7 @@ import Header from '@/components/layout/Header'
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Header user={null} />
+      <Header />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50">

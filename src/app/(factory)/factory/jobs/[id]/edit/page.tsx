@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/contexts/UserContext'
+
 import Header from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,8 +38,6 @@ export default function EditJobPage() {
   const id = params.id as string
   const supabase = createClient()
   const { latitude, longitude } = useGeolocation()
-  const { user } = useUser()
-
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [form, setForm] = useState({
@@ -154,7 +152,7 @@ export default function EditJobPage() {
   if (fetching) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <div className="container mx-auto px-4 py-6 max-w-2xl flex items-center justify-center min-h-[60vh]">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
         </div>
@@ -164,7 +162,7 @@ export default function EditJobPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Chỉnh sửa tin tuyển dụng</h1>
 

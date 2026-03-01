@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import AdminSidebar from '@/components/layout/AdminSidebar'
+import Header from '@/components/layout/Header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -162,10 +162,9 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <AdminSidebar />
-
-      <main className="flex-1 p-8">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Tổng quan hệ thống</h1>
           <p className="text-gray-500 mt-1">Thống kê và dữ liệu nền tảng Labo</p>
@@ -265,7 +264,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

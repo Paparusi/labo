@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/contexts/UserContext'
+
 import Header from '@/components/layout/Header'
 import { DashboardSkeleton } from '@/components/shared/PageSkeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,7 +18,7 @@ import { isSubscriptionActive, getTrialDaysLeft } from '@/lib/subscription'
 import type { Subscription, SubscriptionPlan, FactoryProfile } from '@/types'
 
 export default function FactoryDashboard() {
-  const { user } = useUser()
+
   const [factoryProfile, setFactoryProfile] = useState<FactoryProfile | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null)
@@ -78,7 +78,7 @@ export default function FactoryDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <DashboardSkeleton />
       </div>
     )
@@ -86,7 +86,7 @@ export default function FactoryDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6">
         {/* Trial/Subscription Banner */}
         {subscription?.status === 'trial' && trialDays > 0 && (

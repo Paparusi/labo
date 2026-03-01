@@ -22,15 +22,36 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
 
   const fetchUser = useCallback(async () => {
-    const { data: { user: authUser } } = await supabase.auth.getUser()
-    if (authUser) {
-      const { data } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', authUser.id)
-        .single()
-      setUser(data)
-    } else {
+    try {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (authUser) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', authUser.id)
+          .single()
+
+        if (data) {
+          setUser(data)
+        } else {
+          // Fallback: create minimal user from auth metadata
+          // This prevents null user when DB row is missing
+          console.warn('User row not found in users table, using auth fallback. Error:', error?.message)
+          setUser({
+            id: authUser.id,
+            email: authUser.email || '',
+            phone: authUser.phone || null,
+            role: (authUser.user_metadata?.role as string) || 'worker',
+            is_active: true,
+            created_at: authUser.created_at,
+            updated_at: authUser.created_at,
+          } as User)
+        }
+      } else {
+        setUser(null)
+      }
+    } catch (err) {
+      console.error('Failed to fetch user:', err)
       setUser(null)
     }
     setLoading(false)

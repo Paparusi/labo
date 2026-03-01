@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/contexts/UserContext'
+
 import Header from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,7 +26,7 @@ const SKILL_OPTIONS = [
 ]
 
 export default function WorkerProfilePage() {
-  const { user } = useUser()
+
   const [profile, setProfile] = useState<Partial<WorkerProfile>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -101,7 +101,7 @@ export default function WorkerProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <ProfileSkeleton />
       </div>
     )
@@ -109,7 +109,7 @@ export default function WorkerProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Hồ sơ của tôi</h1>
 

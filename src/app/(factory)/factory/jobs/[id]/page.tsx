@@ -114,7 +114,7 @@ export default function JobDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-emerald-600" /></div>
       </div>
     )
@@ -123,7 +123,7 @@ export default function JobDetailPage() {
   if (!job) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <div className="container mx-auto px-4 py-6 text-center">
           <p>Không tìm thấy tin tuyển dụng</p>
         </div>
@@ -137,7 +137,7 @@ export default function JobDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <Button variant="ghost" asChild className="mb-4">
           <Link href="/factory/jobs"><ArrowLeft className="h-4 w-4 mr-2" />Quay lại</Link>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/contexts/UserContext'
+
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { useSavedJobs } from '@/hooks/useSavedJobs'
 import Header from '@/components/layout/Header'
@@ -31,7 +31,7 @@ const INDUSTRIES = [
 ]
 
 export default function WorkerJobsPage() {
-  const { user } = useUser()
+
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -205,7 +205,7 @@ export default function WorkerJobsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Tìm việc làm</h1>
 

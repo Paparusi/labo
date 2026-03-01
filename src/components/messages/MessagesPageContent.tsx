@@ -60,7 +60,7 @@ export default function MessagesPageContent({ initialConversationId = null }: Me
   if (pageLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={null} />
+        <Header />
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
         </div>
@@ -70,7 +70,7 @@ export default function MessagesPageContent({ initialConversationId = null }: Me
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Tin nhắn</h1>
         <div className="flex gap-0 md:gap-4 h-[calc(100vh-12rem)] bg-white rounded-xl border overflow-hidden">

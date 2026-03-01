@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/contexts/UserContext'
+
 import Header from '@/components/layout/Header'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -22,7 +22,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 }
 
 export default function WorkerApplicationsPage() {
-  const { user } = useUser()
+
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
   const [reviewingFactory, setReviewingFactory] = useState<string | null>(null)
@@ -71,7 +71,7 @@ export default function WorkerApplicationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6 max-w-3xl">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Đơn ứng tuyển của tôi</h1>
 

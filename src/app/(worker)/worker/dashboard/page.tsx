@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { useSavedJobs } from '@/hooks/useSavedJobs'
-import { useUser } from '@/contexts/UserContext'
+
 import Header from '@/components/layout/Header'
 import { DashboardSkeleton } from '@/components/shared/PageSkeleton'
 import MapView from '@/components/map/MapView'
@@ -20,7 +20,7 @@ import { toast } from 'sonner'
 import type { Job, WorkerProfile, Application } from '@/types'
 
 export default function WorkerDashboard() {
-  const { user } = useUser()
+
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
@@ -142,7 +142,7 @@ export default function WorkerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
 
       <div className="container mx-auto px-4 py-6">
         {/* Profile Completeness */}

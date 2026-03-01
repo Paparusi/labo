@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/contexts/UserContext'
+
 import Header from '@/components/layout/Header'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -25,7 +25,6 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 }
 
 export default function FactoryJobsPage() {
-  const { user } = useUser()
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE)
@@ -81,7 +80,7 @@ export default function FactoryJobsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Tin tuyển dụng</h1>

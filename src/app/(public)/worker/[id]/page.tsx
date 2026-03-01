@@ -102,7 +102,7 @@ export default function WorkerProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
         </div>
@@ -113,7 +113,7 @@ export default function WorkerProfilePage() {
   if (notFound || !worker) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
+        <Header />
         <div className="container mx-auto max-w-3xl px-4 py-16 text-center">
           <UserIcon className="h-16 w-16 mx-auto text-gray-300 mb-4" />
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy công nhân</h1>
@@ -128,7 +128,7 @@ export default function WorkerProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header />
       <main className="container mx-auto max-w-3xl px-4 py-6 space-y-6">
         <Button variant="ghost" size="sm" onClick={() => router.back()} className="text-gray-600 hover:text-emerald-600 -ml-2">
           <ArrowLeft className="h-4 w-4 mr-1" />Quay lại
