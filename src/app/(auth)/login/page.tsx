@@ -44,9 +44,10 @@ export default function LoginPage() {
       .eq('id', data.user.id)
       .single()
 
+    const role = profile?.role || (data.user.user_metadata?.role as string) || 'worker'
     const redirectPath =
-      profile?.role === 'admin' ? '/admin' :
-      profile?.role === 'factory' ? '/factory/dashboard' :
+      role === 'admin' ? '/admin' :
+      role === 'factory' ? '/factory/dashboard' :
       '/worker/dashboard'
     router.push(redirectPath)
     router.refresh()
