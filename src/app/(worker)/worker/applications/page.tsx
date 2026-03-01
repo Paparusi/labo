@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -11,7 +12,7 @@ import { Building2, MapPin, Banknote, Clock, Loader2, Star } from 'lucide-react'
 import { toast } from 'sonner'
 import ReviewForm from '@/components/shared/ReviewForm'
 import { formatSalaryRange } from '@/lib/geo'
-import type { User, Application } from '@/types'
+import type { Application } from '@/types'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: { label: 'Chờ xử lý', color: 'bg-yellow-100 text-yellow-700' },
@@ -21,7 +22,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 }
 
 export default function WorkerApplicationsPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
   const [reviewingFactory, setReviewingFactory] = useState<string | null>(null)
@@ -31,9 +32,6 @@ export default function WorkerApplicationsPage() {
     async function fetchData() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
-
-      const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-      setUser(userData)
 
       const { data } = await supabase
         .from('applications')

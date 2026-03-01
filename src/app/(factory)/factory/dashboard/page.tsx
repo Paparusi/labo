@@ -3,20 +3,22 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
+import { DashboardSkeleton } from '@/components/shared/PageSkeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import ProfileCompleteness from '@/components/shared/ProfileCompleteness'
 import {
   Briefcase, Users, FileText, TrendingUp, Plus,
-  Clock, CheckCircle2, XCircle, Loader2, AlertTriangle,
+  Clock, CheckCircle2, XCircle, AlertTriangle,
 } from 'lucide-react'
 import { isSubscriptionActive, getTrialDaysLeft } from '@/lib/subscription'
-import type { User, Subscription, SubscriptionPlan, FactoryProfile } from '@/types'
+import type { Subscription, SubscriptionPlan, FactoryProfile } from '@/types'
 
 export default function FactoryDashboard() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [factoryProfile, setFactoryProfile] = useState<FactoryProfile | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null)
@@ -37,8 +39,7 @@ export default function FactoryDashboard() {
       if (!authUser) return
 
       // Parallelize all independent queries
-      const [userResult, fpResult, subResult, jobCountResult, appResult, recentResult] = await Promise.all([
-        supabase.from('users').select('*').eq('id', authUser.id).single(),
+      const [fpResult, subResult, jobCountResult, appResult, recentResult] = await Promise.all([
         supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single(),
         supabase.from('subscriptions').select('*, subscription_plans(*)').eq('factory_id', authUser.id).order('created_at', { ascending: false }).limit(1).single(),
         supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('factory_id', authUser.id).eq('status', 'active'),
@@ -46,7 +47,6 @@ export default function FactoryDashboard() {
         supabase.from('applications').select('*, jobs!inner(title, factory_id), worker_profiles!applications_worker_id_fkey(full_name, skills)').eq('jobs.factory_id', authUser.id).order('applied_at', { ascending: false }).limit(5),
       ])
 
-      setUser(userResult.data)
       if (fpResult.data) setFactoryProfile(fpResult.data)
       if (subResult.data) {
         setSubscription(subResult.data)
@@ -79,9 +79,7 @@ export default function FactoryDashboard() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header user={user} />
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-        </div>
+        <DashboardSkeleton />
       </div>
     )
   }

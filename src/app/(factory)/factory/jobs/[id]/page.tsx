@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,14 +13,14 @@ import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, Users, MapPin, Banknote, Clock, CheckCircle2, XCircle, Loader2, User, MessageSquare, Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatSalaryRange } from '@/lib/geo'
-import type { User as UserType, Application, WorkerProfile } from '@/types'
+import type { Application, WorkerProfile } from '@/types'
 import ReviewForm from '@/components/shared/ReviewForm'
 import StarRating from '@/components/shared/StarRating'
 
 export default function JobDetailPage() {
   const { id } = useParams()
   const router = useRouter()
-  const [user, setUser] = useState<UserType | null>(null)
+  const { user } = useUser()
   const [job, setJob] = useState<Record<string, unknown> | null>(null)
   const [applications, setApplications] = useState<(Application & { worker?: WorkerProfile })[]>([])
   const [loading, setLoading] = useState(true)
@@ -28,12 +29,6 @@ export default function JobDetailPage() {
 
   useEffect(() => {
     async function fetchData() {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) return
-
-      const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-      setUser(userData)
-
       const { data: jobData } = await supabase.from('jobs').select('*').eq('id', id).single()
       setJob(jobData)
 

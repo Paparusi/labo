@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import MapView from '@/components/map/MapView'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, List, Loader2, User, Star, MessageSquare } from 'lucide-react'
 import { getDistanceLabel } from '@/lib/geo'
 import { getMaxRadius } from '@/lib/subscription'
-import type { User as UserType, FactoryProfile, SubscriptionPlan } from '@/types'
+import type { FactoryProfile, SubscriptionPlan } from '@/types'
 import StarRating from '@/components/shared/StarRating'
 
 interface NearbyWorker {
@@ -33,7 +34,7 @@ interface NearbyWorker {
 
 export default function FactoryWorkersPage() {
   const router = useRouter()
-  const [user, setUser] = useState<UserType | null>(null)
+  const { user } = useUser()
   const [factory, setFactory] = useState<FactoryProfile | null>(null)
   const [workers, setWorkers] = useState<NearbyWorker[]>([])
   const [loading, setLoading] = useState(true)
@@ -49,13 +50,11 @@ export default function FactoryWorkersPage() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
 
-      const [userResult, factoryResult, subResult] = await Promise.all([
-        supabase.from('users').select('*').eq('id', authUser.id).single(),
+      const [factoryResult, subResult] = await Promise.all([
         supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single(),
         supabase.from('subscriptions').select('*, plan:subscription_plans(*)').eq('factory_id', authUser.id).order('created_at', { ascending: false }).limit(1).single(),
       ])
 
-      setUser(userResult.data)
       setFactory(factoryResult.data)
 
       const planMaxRadius = getMaxRadius(subResult.data?.plan as SubscriptionPlan | null)

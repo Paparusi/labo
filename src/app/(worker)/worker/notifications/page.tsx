@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import { useNotifications } from '@/hooks/useNotifications'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Bell, CheckCheck, Loader2, Briefcase, CheckCircle2, XCircle, AlertTriangle, MessageSquare } from 'lucide-react'
-import type { User, Notification } from '@/types'
+import type { Notification } from '@/types'
 
 const ICON_MAP: Record<string, typeof Bell> = {
   new_job_nearby: Briefcase,
@@ -35,35 +36,22 @@ function getNotificationHref(n: Notification): string | null {
 }
 
 export default function NotificationsPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [userId, setUserId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
-    async function fetchUser() {
+    async function fetchUserId() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        const { data } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-        setUser(data)
         setUserId(authUser.id)
       }
-      setLoading(false)
     }
-    fetchUser()
+    fetchUserId()
   }, [supabase])
 
   const { notifications, unreadCount, markAsRead, markAllRead } = useNotifications(userId)
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header user={user} />
-        <div className="flex items-center justify-center h-64"><Loader2 className="h-8 w-8 animate-spin text-emerald-600" /></div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

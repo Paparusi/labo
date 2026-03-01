@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { useSavedJobs } from '@/hooks/useSavedJobs'
 import Header from '@/components/layout/Header'
@@ -9,9 +10,13 @@ import JobCard from '@/components/jobs/JobCard'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Search, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react'
+import { JobSearchSkeleton } from '@/components/shared/PageSkeleton'
 import { toast } from 'sonner'
-import type { User, Job } from '@/types'
+import type { Job } from '@/types'
+
+const PAGE_SIZE = 20
 
 const INDUSTRIES = [
   { value: 'all', label: 'Tất cả ngành' },
@@ -26,7 +31,7 @@ const INDUSTRIES = [
 ]
 
 export default function WorkerJobsPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -35,24 +40,15 @@ export default function WorkerJobsPage() {
   const [shiftFilter, setShiftFilter] = useState('all')
   const [salaryMin, setSalaryMin] = useState('all')
   const [sortBy, setSortBy] = useState('newest')
+  const [displayCount, setDisplayCount] = useState(PAGE_SIZE)
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set())
   const { latitude, longitude } = useGeolocation()
   const { toggleSave, isSaved } = useSavedJobs()
   const supabase = createClient()
 
-  useEffect(() => {
-    async function fetchUser() {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (authUser) {
-        const { data } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-        setUser(data)
-      }
-    }
-    fetchUser()
-  }, [supabase])
-
   const fetchJobs = useCallback(async () => {
     setLoading(true)
+    setDisplayCount(PAGE_SIZE)
 
     if (latitude && longitude) {
       const { data } = await supabase.rpc('nearby_jobs', {
@@ -101,7 +97,7 @@ export default function WorkerJobsPage() {
         .select('*, factory_profiles!jobs_factory_id_fkey(company_name, logo_url)')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
-        .limit(50)
+        .limit(200)
 
       if (industry !== 'all') query = query.eq('industry', industry)
       if (shiftFilter !== 'all') query = query.eq('shift_type', shiftFilter)
@@ -278,7 +274,7 @@ export default function WorkerJobsPage() {
 
         <div className="flex items-center gap-3 mb-4">
           <Badge variant="secondary">
-            {jobs.length} việc làm
+            {Math.min(displayCount, jobs.length)}/{jobs.length} việc làm
           </Badge>
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-40 h-8 text-xs">
@@ -296,9 +292,7 @@ export default function WorkerJobsPage() {
         {/* Job List */}
         <div className="space-y-3 max-w-3xl">
           {loading ? (
-            <div className="flex items-center justify-center h-32">
-              <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-            </div>
+            <JobSearchSkeleton />
           ) : jobs.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <SlidersHorizontal className="h-12 w-12 mx-auto mb-3 text-gray-300" />
@@ -306,16 +300,28 @@ export default function WorkerJobsPage() {
               <p className="text-sm mt-1">Thử thay đổi bộ lọc hoặc mở rộng bán kính</p>
             </div>
           ) : (
-            jobs.map(job => (
-              <JobCard
-                key={job.id}
-                job={job}
-                onApply={handleApply}
-                applied={appliedJobs.has(job.id)}
-                isSaved={isSaved(job.id)}
-                onToggleSave={toggleSave}
-              />
-            ))
+            <>
+              {jobs.slice(0, displayCount).map(job => (
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  onApply={handleApply}
+                  applied={appliedJobs.has(job.id)}
+                  isSaved={isSaved(job.id)}
+                  onToggleSave={toggleSave}
+                />
+              ))}
+              {displayCount < jobs.length && (
+                <div className="text-center pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setDisplayCount(prev => prev + PAGE_SIZE)}
+                  >
+                    Xem thêm ({jobs.length - displayCount} việc làm còn lại)
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

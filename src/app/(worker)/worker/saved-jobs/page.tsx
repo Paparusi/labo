@@ -3,14 +3,15 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import JobCard from '@/components/jobs/JobCard'
 import { useSavedJobs } from '@/hooks/useSavedJobs'
 import { Bookmark } from 'lucide-react'
-import type { User, Job } from '@/types'
+import type { Job } from '@/types'
 
 export default function SavedJobsPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [savedJobs, setSavedJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const { toggleSave, isSaved } = useSavedJobs()
@@ -22,14 +23,6 @@ export default function SavedJobsPage() {
         // Get user
         const { data: { user: authUser } } = await supabase.auth.getUser()
         if (!authUser) return
-
-        const { data: userData } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', authUser.id)
-          .single()
-
-        setUser(userData)
 
         // Fetch saved jobs with job details and factory info
         const { data: savedJobsData, error } = await supabase

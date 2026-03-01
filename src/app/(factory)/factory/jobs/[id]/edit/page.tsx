@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,7 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Plus, X, Save, Navigation, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { useGeolocation } from '@/hooks/useGeolocation'
-import type { User } from '@/types'
 
 const INDUSTRIES = [
   'electronics', 'garment', 'footwear', 'food',
@@ -38,8 +38,8 @@ export default function EditJobPage() {
   const id = params.id as string
   const supabase = createClient()
   const { latitude, longitude } = useGeolocation()
+  const { user } = useUser()
 
-  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [form, setForm] = useState({
@@ -67,13 +67,6 @@ export default function EditJobPage() {
         router.push('/factory/jobs')
         return
       }
-
-      const { data: userData } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', authUser.id)
-        .single()
-      setUser(userData)
 
       const { data: job, error } = await supabase
         .from('jobs')

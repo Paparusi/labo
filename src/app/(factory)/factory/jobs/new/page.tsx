@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,7 +16,7 @@ import { Loader2, Plus, X, Save, Navigation, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { canPostJob } from '@/lib/subscription'
-import type { User, Subscription, SubscriptionPlan } from '@/types'
+import type { Subscription, SubscriptionPlan } from '@/types'
 
 const INDUSTRIES = [
   'electronics', 'garment', 'footwear', 'food',
@@ -34,7 +35,7 @@ const SKILL_OPTIONS = [
 ]
 
 export default function NewJobPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [loading, setLoading] = useState(false)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null)
@@ -60,12 +61,9 @@ export default function NewJobPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    async function fetchUser() {
+    async function fetchData() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        const { data } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-        setUser(data)
-
         // Check subscription limits
         const { data: sub } = await supabase
           .from('subscriptions')
@@ -103,7 +101,7 @@ export default function NewJobPage() {
         }
       }
     }
-    fetchUser()
+    fetchData()
   }, [supabase])
 
   const handleSubmit = async (e: React.FormEvent, status: 'active' | 'draft' = 'active') => {

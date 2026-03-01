@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,11 +12,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MapPin, Save, Loader2, Plus, X, Navigation, User as UserIcon } from 'lucide-react'
+import { ProfileSkeleton } from '@/components/shared/PageSkeleton'
 import { toast } from 'sonner'
 import ImageUpload from '@/components/shared/ImageUpload'
 import ChangePassword from '@/components/shared/ChangePassword'
 import { useGeolocation } from '@/hooks/useGeolocation'
-import type { User, WorkerProfile } from '@/types'
+import type { WorkerProfile } from '@/types'
 
 const SKILL_OPTIONS = [
   'May', 'Hàn', 'Lắp ráp', 'Kiểm tra chất lượng', 'Vận hành máy',
@@ -24,7 +26,7 @@ const SKILL_OPTIONS = [
 ]
 
 export default function WorkerProfilePage() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [profile, setProfile] = useState<Partial<WorkerProfile>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -36,9 +38,6 @@ export default function WorkerProfilePage() {
     async function fetchProfile() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
-
-      const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-      setUser(userData)
 
       const { data } = await supabase.from('worker_profiles').select('*').eq('user_id', authUser.id).single()
       if (data) setProfile(data)
@@ -103,9 +102,7 @@ export default function WorkerProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header user={user} />
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-        </div>
+        <ProfileSkeleton />
       </div>
     )
   }

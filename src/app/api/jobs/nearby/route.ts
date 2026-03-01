@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimit } from '@/lib/rate-limit'
 
 const nearbySchema = z.object({
   lat: z.number().min(-90).max(90),
@@ -9,6 +10,12 @@ const nearbySchema = z.object({
 })
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+  const { success } = rateLimit(`jobs:${ip}`, 30, 60_000)
+  if (!success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
+
   const supabase = await createClient()
   const { searchParams } = request.nextUrl
 

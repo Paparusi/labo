@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createPaymentUrl } from '@/lib/vnpay'
+import { rateLimit } from '@/lib/rate-limit'
 
 const checkoutSchema = z.object({
   plan_id: z.string().uuid(),
@@ -15,6 +16,11 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { success } = rateLimit(`checkout:${user.id}`, 5, 60_000)
+  if (!success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   let body: unknown

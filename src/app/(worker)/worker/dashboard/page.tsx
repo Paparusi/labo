@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { useSavedJobs } from '@/hooks/useSavedJobs'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
+import { DashboardSkeleton } from '@/components/shared/PageSkeleton'
 import MapView from '@/components/map/MapView'
 import JobCard from '@/components/jobs/JobCard'
 import Link from 'next/link'
@@ -15,10 +17,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import ProfileCompleteness from '@/components/shared/ProfileCompleteness'
 import { MapPin, List, Loader2, Navigation, AlertCircle, FileText, CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
-import type { User, Job, WorkerProfile, Application } from '@/types'
+import type { Job, WorkerProfile, Application } from '@/types'
 
 export default function WorkerDashboard() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,20 +33,16 @@ export default function WorkerDashboard() {
   const { toggleSave, isSaved } = useSavedJobs()
   const supabase = createClient()
 
-  // Fetch user + profile in parallel
+  // Fetch worker profile
   useEffect(() => {
-    async function fetchUser() {
+    async function fetchProfile() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        const [userResult, wpResult] = await Promise.all([
-          supabase.from('users').select('*').eq('id', authUser.id).single(),
-          supabase.from('worker_profiles').select('*').eq('user_id', authUser.id).single(),
-        ])
-        setUser(userResult.data)
-        if (wpResult.data) setWorkerProfile(wpResult.data)
+        const { data: wpData } = await supabase.from('worker_profiles').select('*').eq('user_id', authUser.id).single()
+        if (wpData) setWorkerProfile(wpData)
       }
     }
-    fetchUser()
+    fetchProfile()
   }, [supabase])
 
   // Fetch nearby jobs
@@ -268,9 +266,7 @@ export default function WorkerDashboard() {
 
         {/* Content */}
         {geoLoading ? (
-          <div className="flex items-center justify-center h-96">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-          </div>
+          <DashboardSkeleton />
         ) : viewMode === 'map' ? (
           <div className="grid lg:grid-cols-5 gap-6">
             {/* Map */}

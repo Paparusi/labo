@@ -3,15 +3,20 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/contexts/UserContext'
 import Header from '@/components/layout/Header'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Users, Clock, MapPin, Loader2, Eye, Trash2, Pencil } from 'lucide-react'
+import { Plus, Users, Clock, MapPin, Eye, Trash2, Pencil } from 'lucide-react'
+import { JobListSkeleton } from '@/components/shared/PageSkeleton'
 import { toast } from 'sonner'
 import { formatSalaryRange } from '@/lib/geo'
-import type { User, Job } from '@/types'
+import { Loader2 } from 'lucide-react'
+import type { Job } from '@/types'
+
+const PAGE_SIZE = 20
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   active: { label: 'Đang tuyển', color: 'bg-green-100 text-green-700' },
@@ -20,18 +25,16 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 }
 
 export default function FactoryJobsPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useUser()
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
+  const [displayCount, setDisplayCount] = useState(PAGE_SIZE)
   const supabase = createClient()
 
   useEffect(() => {
     async function fetchData() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
-
-      const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-      setUser(userData)
 
       const { data } = await supabase
         .from('jobs')
@@ -88,9 +91,7 @@ export default function FactoryJobsPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center h-32">
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-          </div>
+          <JobListSkeleton />
         ) : (
           <Tabs defaultValue="all">
             <TabsList className="mb-4">
@@ -110,65 +111,77 @@ export default function FactoryJobsPage() {
                     </Button>
                   </div>
                 ) : (
-                  filterByStatus(tab).map(job => (
-                    <Card key={job.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold text-gray-900">{job.title}</h3>
-                              <Badge className={STATUS_MAP[job.status]?.color}>
-                                {STATUS_MAP[job.status]?.label}
-                              </Badge>
-                            </div>
-                            <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-500">
-                              <span>{formatSalaryRange(job.salary_min, job.salary_max)}</span>
-                              <span>{job.positions} vị trí</span>
-                              {job.address && (
+                  <>
+                    {filterByStatus(tab).slice(0, displayCount).map(job => (
+                      <Card key={job.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold text-gray-900">{job.title}</h3>
+                                <Badge className={STATUS_MAP[job.status]?.color}>
+                                  {STATUS_MAP[job.status]?.label}
+                                </Badge>
+                              </div>
+                              <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-500">
+                                <span>{formatSalaryRange(job.salary_min, job.salary_max)}</span>
+                                <span>{job.positions} vị trí</span>
+                                {job.address && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="h-3.5 w-3.5" />{job.address}
+                                  </span>
+                                )}
                                 <span className="flex items-center gap-1">
-                                  <MapPin className="h-3.5 w-3.5" />{job.address}
+                                  <Users className="h-3.5 w-3.5" />
+                                  {job._applications_count || 0} ứng viên
                                 </span>
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3.5 w-3.5" />
+                                  {new Date(job.created_at).toLocaleDateString('vi-VN')}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button variant="ghost" size="sm" asChild>
+                                <Link href={`/factory/jobs/${job.id}`}>
+                                  <Eye className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                              <Button variant="ghost" size="sm" asChild>
+                                <Link href={`/factory/jobs/${job.id}/edit`}>
+                                  <Pencil className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                              {job.status === 'active' ? (
+                                <Button variant="ghost" size="sm" onClick={() => toggleJobStatus(job.id, 'closed')}>
+                                  Đóng
+                                </Button>
+                              ) : job.status === 'closed' || job.status === 'draft' ? (
+                                <Button variant="ghost" size="sm" onClick={() => toggleJobStatus(job.id, 'active')}>
+                                  Mở lại
+                                </Button>
+                              ) : null}
+                              {job.status === 'draft' && (
+                                <Button variant="ghost" size="sm" className="text-red-600" onClick={() => deleteJob(job.id)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               )}
-                              <span className="flex items-center gap-1">
-                                <Users className="h-3.5 w-3.5" />
-                                {job._applications_count || 0} ứng viên
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3.5 w-3.5" />
-                                {new Date(job.created_at).toLocaleDateString('vi-VN')}
-                              </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link href={`/factory/jobs/${job.id}`}>
-                                <Eye className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link href={`/factory/jobs/${job.id}/edit`}>
-                                <Pencil className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            {job.status === 'active' ? (
-                              <Button variant="ghost" size="sm" onClick={() => toggleJobStatus(job.id, 'closed')}>
-                                Đóng
-                              </Button>
-                            ) : job.status === 'closed' || job.status === 'draft' ? (
-                              <Button variant="ghost" size="sm" onClick={() => toggleJobStatus(job.id, 'active')}>
-                                Mở lại
-                              </Button>
-                            ) : null}
-                            {job.status === 'draft' && (
-                              <Button variant="ghost" size="sm" className="text-red-600" onClick={() => deleteJob(job.id)}>
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    ))}
+                    {displayCount < filterByStatus(tab).length && (
+                      <div className="text-center pt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => setDisplayCount(prev => prev + PAGE_SIZE)}
+                        >
+                          Xem thêm ({filterByStatus(tab).length - displayCount} tin còn lại)
+                        </Button>
+                      </div>
+                    )}
+                  </>
                 )}
               </TabsContent>
             ))}
