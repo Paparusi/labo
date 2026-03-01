@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Star, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { toast } from 'sonner'
 import StarRating from '@/components/shared/StarRating'
 
 const REVIEWS_PER_PAGE = 20
@@ -102,10 +103,15 @@ export default function AdminReviewsPage() {
   }, [fetchReviews])
 
   const handleDelete = async (reviewId: string) => {
-    if (!confirm('Xóa đánh giá này?')) return
-    await supabase.from('reviews').delete().eq('id', reviewId)
+    if (!confirm('Bạn có chắc muốn xóa đánh giá này?')) return
+    const { error } = await supabase.from('reviews').delete().eq('id', reviewId)
+    if (error) {
+      toast.error('Không thể xóa đánh giá')
+      return
+    }
     setReviews(prev => prev.filter(r => r.id !== reviewId))
     setTotal(prev => prev - 1)
+    toast.success('Đã xóa đánh giá')
   }
 
   const totalPages = Math.ceil(total / REVIEWS_PER_PAGE)

@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Save, Loader2, Navigation, MapPin, Building2 } from 'lucide-react'
+import { toast } from 'sonner'
 import ImageUpload from '@/components/shared/ImageUpload'
 import ChangePassword from '@/components/shared/ChangePassword'
 import { useGeolocation } from '@/hooks/useGeolocation'
@@ -52,7 +53,7 @@ export default function FactoryProfilePage() {
     const { data: { user: authUser } } = await supabase.auth.getUser()
     if (!authUser) return
     setSaving(true)
-    await supabase.from('factory_profiles').upsert({
+    const { error } = await supabase.from('factory_profiles').upsert({
       user_id: authUser.id,
       company_name: profile.company_name || '',
       industry: profile.industry,
@@ -67,6 +68,11 @@ export default function FactoryProfilePage() {
       logo_url: profile.logo_url,
     }, { onConflict: 'user_id' })
     setSaving(false)
+    if (error) {
+      toast.error('Lưu hồ sơ thất bại')
+    } else {
+      toast.success('Đã lưu hồ sơ thành công')
+    }
   }
 
   if (loading) {

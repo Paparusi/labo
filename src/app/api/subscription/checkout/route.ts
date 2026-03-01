@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createPaymentUrl } from '@/lib/vnpay'
+
+const checkoutSchema = z.object({
+  plan_id: z.string().uuid(),
+  interval: z.enum(['monthly', 'yearly']),
+  amount: z.number().int().positive().max(100_000_000),
+})
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -10,12 +17,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
-  const { plan_id, interval, amount } = body
-
-  if (!plan_id || !amount) {
-    return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
+
+  const parsed = checkoutSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 })
+  }
+
+  const { plan_id, interval, amount } = parsed.data
 
   // Create pending payment record
   const orderId = `VN${Date.now()}`

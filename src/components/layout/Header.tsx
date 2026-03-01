@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useNotifications } from '@/hooks/useNotifications'
 import { Button } from '@/components/ui/button'
@@ -25,7 +25,16 @@ export default function Header({ user }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [unreadMessages, setUnreadMessages] = useState(0)
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
+
+  const navClass = (href: string) =>
+    `text-sm font-medium transition-colors ${
+      pathname.startsWith(href) ? 'text-emerald-600 font-semibold' : 'text-gray-600 hover:text-emerald-600'
+    }`
+
+  const mobileNavClass = (href: string) =>
+    `block py-2 ${pathname.startsWith(href) ? 'text-emerald-600 font-semibold' : 'text-gray-700'}`
   const { unreadCount: unreadNotifications } = useNotifications(user?.id ?? null)
 
   useEffect(() => {
@@ -73,34 +82,34 @@ export default function Header({ user }: HeaderProps) {
           <nav className="hidden md:flex items-center gap-6">
             {user.role === 'worker' ? (
               <>
-                <Link href="/worker/dashboard" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/worker/dashboard" className={navClass('/worker/dashboard')}>
                   Bản đồ việc làm
                 </Link>
-                <Link href="/worker/jobs" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/worker/jobs" className={navClass('/worker/jobs')}>
                   Tìm việc
                 </Link>
-                <Link href="/worker/saved-jobs" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/worker/saved-jobs" className={navClass('/worker/saved-jobs')}>
                   Việc làm đã lưu
                 </Link>
-                <Link href="/worker/applications" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/worker/applications" className={navClass('/worker/applications')}>
                   Đơn ứng tuyển
                 </Link>
-                <Link href="/worker/messages" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/worker/messages" className={navClass('/worker/messages')}>
                   Tin nhắn
                 </Link>
               </>
             ) : (
               <>
-                <Link href="/factory/dashboard" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/factory/dashboard" className={navClass('/factory/dashboard')}>
                   Bảng điều khiển
                 </Link>
-                <Link href="/factory/jobs" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/factory/jobs" className={navClass('/factory/jobs')}>
                   Tin tuyển dụng
                 </Link>
-                <Link href="/factory/workers" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/factory/workers" className={navClass('/factory/workers')}>
                   Tìm công nhân
                 </Link>
-                <Link href="/factory/messages" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link href="/factory/messages" className={navClass('/factory/messages')}>
                   Tin nhắn
                 </Link>
               </>
@@ -204,31 +213,31 @@ export default function Header({ user }: HeaderProps) {
             <>
               {user.role === 'worker' ? (
                 <>
-                  <Link href="/worker/dashboard" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Bản đồ việc làm</Link>
-                  <Link href="/worker/jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tìm việc</Link>
-                  <Link href="/worker/saved-jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Việc làm đã lưu</Link>
-                  <Link href="/worker/applications" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Đơn ứng tuyển</Link>
-                  <Link href="/worker/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/worker/dashboard" className={mobileNavClass('/worker/dashboard')} onClick={() => setMobileMenuOpen(false)}>Bản đồ việc làm</Link>
+                  <Link href="/worker/jobs" className={mobileNavClass('/worker/jobs')} onClick={() => setMobileMenuOpen(false)}>Tìm việc</Link>
+                  <Link href="/worker/saved-jobs" className={mobileNavClass('/worker/saved-jobs')} onClick={() => setMobileMenuOpen(false)}>Việc làm đã lưu</Link>
+                  <Link href="/worker/applications" className={mobileNavClass('/worker/applications')} onClick={() => setMobileMenuOpen(false)}>Đơn ứng tuyển</Link>
+                  <Link href="/worker/messages" className={mobileNavClass('/worker/messages')} onClick={() => setMobileMenuOpen(false)}>
                     Tin nhắn {unreadMessages > 0 && <Badge className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0">{unreadMessages}</Badge>}
                   </Link>
-                  <Link href="/worker/notifications" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/worker/notifications" className={mobileNavClass('/worker/notifications')} onClick={() => setMobileMenuOpen(false)}>
                     Thông báo {unreadNotifications > 0 && <Badge className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0">{unreadNotifications}</Badge>}
                   </Link>
-                  <Link href="/worker/profile" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Hồ sơ</Link>
+                  <Link href="/worker/profile" className={mobileNavClass('/worker/profile')} onClick={() => setMobileMenuOpen(false)}>Hồ sơ</Link>
                 </>
               ) : (
                 <>
-                  <Link href="/factory/dashboard" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Bảng điều khiển</Link>
-                  <Link href="/factory/jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tin tuyển dụng</Link>
-                  <Link href="/factory/workers" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tìm công nhân</Link>
-                  <Link href="/factory/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/factory/dashboard" className={mobileNavClass('/factory/dashboard')} onClick={() => setMobileMenuOpen(false)}>Bảng điều khiển</Link>
+                  <Link href="/factory/jobs" className={mobileNavClass('/factory/jobs')} onClick={() => setMobileMenuOpen(false)}>Tin tuyển dụng</Link>
+                  <Link href="/factory/workers" className={mobileNavClass('/factory/workers')} onClick={() => setMobileMenuOpen(false)}>Tìm công nhân</Link>
+                  <Link href="/factory/messages" className={mobileNavClass('/factory/messages')} onClick={() => setMobileMenuOpen(false)}>
                     Tin nhắn {unreadMessages > 0 && <Badge className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0">{unreadMessages}</Badge>}
                   </Link>
-                  <Link href="/factory/notifications" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/factory/notifications" className={mobileNavClass('/factory/notifications')} onClick={() => setMobileMenuOpen(false)}>
                     Thông báo {unreadNotifications > 0 && <Badge className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0">{unreadNotifications}</Badge>}
                   </Link>
-                  <Link href="/factory/profile" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Hồ sơ</Link>
-                  <Link href="/factory/subscription" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Gói dịch vụ</Link>
+                  <Link href="/factory/profile" className={mobileNavClass('/factory/profile')} onClick={() => setMobileMenuOpen(false)}>Hồ sơ</Link>
+                  <Link href="/factory/subscription" className={mobileNavClass('/factory/subscription')} onClick={() => setMobileMenuOpen(false)}>Gói dịch vụ</Link>
                 </>
               )}
               <button onClick={handleLogout} className="block w-full text-left py-2 text-red-600">Đăng xuất</button>

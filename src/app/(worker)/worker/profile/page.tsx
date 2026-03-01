@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MapPin, Save, Loader2, Plus, X, Navigation, User as UserIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import ImageUpload from '@/components/shared/ImageUpload'
 import ChangePassword from '@/components/shared/ChangePassword'
 import { useGeolocation } from '@/hooks/useGeolocation'
@@ -69,6 +70,11 @@ export default function WorkerProfilePage() {
       }, { onConflict: 'user_id' })
 
     setSaving(false)
+    if (error) {
+      toast.error('Lưu hồ sơ thất bại')
+    } else {
+      toast.success('Đã lưu hồ sơ thành công')
+    }
   }
 
   const addSkill = (skill: string) => {

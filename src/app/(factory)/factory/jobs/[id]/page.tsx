@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, Users, MapPin, Banknote, Clock, CheckCircle2, XCircle, Loader2, User, MessageSquare, Star } from 'lucide-react'
+import { toast } from 'sonner'
 import { formatSalaryRange } from '@/lib/geo'
 import type { User as UserType, Application, WorkerProfile } from '@/types'
 import ReviewForm from '@/components/shared/ReviewForm'
@@ -54,8 +55,13 @@ export default function JobDetailPage() {
   }, [id, supabase])
 
   const updateApplicationStatus = async (appId: string, status: 'accepted' | 'rejected') => {
-    await supabase.from('applications').update({ status }).eq('id', appId)
+    const { error } = await supabase.from('applications').update({ status }).eq('id', appId)
+    if (error) {
+      toast.error('Không thể cập nhật trạng thái')
+      return
+    }
     setApplications(prev => prev.map(a => a.id === appId ? { ...a, status } : a))
+    toast.success(status === 'accepted' ? 'Đã chấp nhận ứng viên' : 'Đã từ chối ứng viên')
 
     // Notify worker
     const app = applications.find(a => a.id === appId)

@@ -1,22 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+
+const nearbySchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+  radius: z.number().min(1).max(200).default(10),
+})
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
   const { searchParams } = request.nextUrl
 
-  const lat = parseFloat(searchParams.get('lat') || '0')
-  const lng = parseFloat(searchParams.get('lng') || '0')
-  const radius = parseFloat(searchParams.get('radius') || '10') * 1000
+  const parsed = nearbySchema.safeParse({
+    lat: parseFloat(searchParams.get('lat') || ''),
+    lng: parseFloat(searchParams.get('lng') || ''),
+    radius: searchParams.get('radius') ? parseFloat(searchParams.get('radius')!) : undefined,
+  })
 
-  if (!lat || !lng) {
-    return NextResponse.json({ error: 'lat and lng required' }, { status: 400 })
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid coordinates' }, { status: 400 })
   }
+
+  const { lat, lng, radius } = parsed.data
 
   const { data, error } = await supabase.rpc('nearby_workers', {
     lat,
     lng,
-    radius_meters: radius,
+    radius_meters: radius * 1000,
   })
 
   if (error) {

@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Plus, X, Save, Navigation, AlertTriangle } from 'lucide-react'
+import { toast } from 'sonner'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { canPostJob } from '@/lib/subscription'
 import type { User, Subscription, SubscriptionPlan } from '@/types'
@@ -130,7 +131,10 @@ export default function NewJobPage() {
       status,
     })
 
-    if (!error) {
+    if (error) {
+      toast.error('Đăng tin thất bại. Vui lòng thử lại.')
+    } else {
+      toast.success(status === 'draft' ? 'Đã lưu bản nháp' : 'Đã đăng tin tuyển dụng')
       router.push('/factory/jobs')
     }
     setLoading(false)

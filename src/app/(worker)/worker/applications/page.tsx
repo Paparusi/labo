@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Building2, MapPin, Banknote, Clock, Loader2, Star } from 'lucide-react'
+import { toast } from 'sonner'
 import ReviewForm from '@/components/shared/ReviewForm'
 import { formatSalaryRange } from '@/lib/geo'
 import type { User, Application } from '@/types'
@@ -55,8 +56,14 @@ export default function WorkerApplicationsPage() {
   }, [supabase])
 
   const handleWithdraw = async (appId: string) => {
-    await supabase.from('applications').update({ status: 'withdrawn' }).eq('id', appId)
+    if (!confirm('Bạn có chắc muốn rút đơn ứng tuyển này?')) return
+    const { error } = await supabase.from('applications').update({ status: 'withdrawn' }).eq('id', appId)
+    if (error) {
+      toast.error('Không thể rút đơn ứng tuyển')
+      return
+    }
     setApplications(prev => prev.map(a => a.id === appId ? { ...a, status: 'withdrawn' } : a))
+    toast.success('Đã rút đơn ứng tuyển')
   }
 
   const filterByStatus = (status: string) => {

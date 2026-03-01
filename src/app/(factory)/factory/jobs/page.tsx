@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus, Users, Clock, MapPin, Loader2, Eye, Trash2, Pencil } from 'lucide-react'
+import { toast } from 'sonner'
 import { formatSalaryRange } from '@/lib/geo'
 import type { User, Job } from '@/types'
 
@@ -50,13 +51,24 @@ export default function FactoryJobsPage() {
   }, [supabase])
 
   const toggleJobStatus = async (jobId: string, newStatus: 'active' | 'closed') => {
-    await supabase.from('jobs').update({ status: newStatus }).eq('id', jobId)
+    const { error } = await supabase.from('jobs').update({ status: newStatus }).eq('id', jobId)
+    if (error) {
+      toast.error('Không thể cập nhật trạng thái')
+      return
+    }
     setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: newStatus } : j))
+    toast.success(newStatus === 'active' ? 'Đã mở lại tin tuyển dụng' : 'Đã đóng tin tuyển dụng')
   }
 
   const deleteJob = async (jobId: string) => {
-    await supabase.from('jobs').delete().eq('id', jobId)
+    if (!confirm('Bạn có chắc muốn xóa tin tuyển dụng này?')) return
+    const { error } = await supabase.from('jobs').delete().eq('id', jobId)
+    if (error) {
+      toast.error('Không thể xóa tin tuyển dụng')
+      return
+    }
     setJobs(prev => prev.filter(j => j.id !== jobId))
+    toast.success('Đã xóa tin tuyển dụng')
   }
 
   const filterByStatus = (status: string) => {
