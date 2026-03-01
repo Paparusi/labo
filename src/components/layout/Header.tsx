@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import {
   Bell, Menu, X, MapPin, User, LogOut, Building2, Briefcase,
-  ChevronDown, MessageSquare, HardHat, Shield,
+  ChevronDown, MessageSquare, HardHat, Shield, Settings,
 } from 'lucide-react'
 
 /* ─────────────────────────────────────────────
@@ -52,7 +52,7 @@ const ROLE_CONFIG: Record<string, {
     notifications: '/worker/notifications',
     profile: '/worker/profile',
     home: '/worker/dashboard',
-    extra: [],
+    extra: [{ href: '/worker/settings', label: 'Cài đặt', Icon: Settings }],
   },
   factory: {
     label: 'Nhà máy',
@@ -69,7 +69,10 @@ const ROLE_CONFIG: Record<string, {
     notifications: '/factory/notifications',
     profile: '/factory/profile',
     home: '/factory/dashboard',
-    extra: [{ href: '/factory/subscription', label: 'Gói dịch vụ', Icon: Briefcase }],
+    extra: [
+      { href: '/factory/subscription', label: 'Gói dịch vụ', Icon: Briefcase },
+      { href: '/factory/settings', label: 'Cài đặt', Icon: Settings },
+    ],
   },
   admin: {
     label: 'Quản trị viên',
@@ -196,6 +199,9 @@ export default function Header() {
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/pricing" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
               Bảng giá
+            </Link>
+            <Link href="/faq" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+              Hỏi đáp
             </Link>
             <Link href="/#how-it-works" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
               Cách hoạt động
@@ -366,6 +372,7 @@ export default function Header() {
           ) : (
             <>
               <Link href="/pricing" className="block py-2 text-sm text-gray-700" onClick={() => setMobileOpen(false)}>Bảng giá</Link>
+              <Link href="/faq" className="block py-2 text-sm text-gray-700" onClick={() => setMobileOpen(false)}>Hỏi đáp</Link>
               <Link href="/#how-it-works" className="block py-2 text-sm text-gray-700" onClick={() => setMobileOpen(false)}>Cách hoạt động</Link>
               <div className="flex gap-3 pt-3 border-t mt-2">
                 <Button variant="outline" asChild className="flex-1">

@@ -77,5 +77,18 @@ export function useNotifications(userId: string | null) {
     setUnreadCount(0)
   }
 
-  return { notifications, unreadCount, markAsRead, markAllRead, refresh: fetchNotifications }
+  const deleteNotification = async (notificationId: string) => {
+    await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', notificationId)
+
+    setNotifications(prev => {
+      const removed = prev.find(n => n.id === notificationId)
+      if (removed && !removed.is_read) setUnreadCount(c => Math.max(0, c - 1))
+      return prev.filter(n => n.id !== notificationId)
+    })
+  }
+
+  return { notifications, unreadCount, markAsRead, markAllRead, deleteNotification, refresh: fetchNotifications }
 }

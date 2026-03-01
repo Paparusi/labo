@@ -14,6 +14,7 @@ import { Save, Loader2, Navigation, MapPin, Building2 } from 'lucide-react'
 import { ProfileSkeleton } from '@/components/shared/PageSkeleton'
 import { toast } from 'sonner'
 import ImageUpload from '@/components/shared/ImageUpload'
+import AddressAutocomplete from '@/components/shared/AddressAutocomplete'
 import ChangePassword from '@/components/shared/ChangePassword'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import type { FactoryProfile } from '@/types'
@@ -160,7 +161,12 @@ export default function FactoryProfilePage() {
             <CardContent className="space-y-4">
               <div>
                 <Label>Địa chỉ</Label>
-                <Input value={profile.address || ''} onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))} placeholder="Địa chỉ nhà máy..." />
+                <AddressAutocomplete
+                  value={profile.address || ''}
+                  onChange={(v) => setProfile(prev => ({ ...prev, address: v }))}
+                  onSelect={(r) => setProfile(prev => ({ ...prev, address: r.address, latitude: r.latitude, longitude: r.longitude }))}
+                  placeholder="Địa chỉ nhà máy..."
+                />
               </div>
               <div className="flex items-center gap-3">
                 <Button variant="outline" size="sm" onClick={() => {

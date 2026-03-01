@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Plus, X, Save, Navigation, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
+import AddressAutocomplete from '@/components/shared/AddressAutocomplete'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { canPostJob } from '@/lib/subscription'
 import type { Subscription, SubscriptionPlan } from '@/types'
@@ -301,9 +302,10 @@ export default function NewJobPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label>Địa chỉ</Label>
-                <Input
+                <AddressAutocomplete
                   value={form.address}
-                  onChange={(e) => setForm(prev => ({ ...prev, address: e.target.value }))}
+                  onChange={(v) => setForm(prev => ({ ...prev, address: v }))}
+                  onSelect={(r) => setForm(prev => ({ ...prev, address: r.address, latitude: r.latitude, longitude: r.longitude }))}
                   placeholder="Địa chỉ nhà máy..."
                 />
               </div>

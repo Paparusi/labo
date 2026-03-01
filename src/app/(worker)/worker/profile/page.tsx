@@ -15,6 +15,7 @@ import { MapPin, Save, Loader2, Plus, X, Navigation, User as UserIcon } from 'lu
 import { ProfileSkeleton } from '@/components/shared/PageSkeleton'
 import { toast } from 'sonner'
 import ImageUpload from '@/components/shared/ImageUpload'
+import AddressAutocomplete from '@/components/shared/AddressAutocomplete'
 import ChangePassword from '@/components/shared/ChangePassword'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import type { WorkerProfile } from '@/types'
@@ -185,9 +186,10 @@ export default function WorkerProfilePage() {
             <CardContent className="space-y-4">
               <div>
                 <Label>Địa chỉ</Label>
-                <Input
+                <AddressAutocomplete
                   value={profile.address || ''}
-                  onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
+                  onChange={(v) => setProfile(prev => ({ ...prev, address: v }))}
+                  onSelect={(r) => setProfile(prev => ({ ...prev, address: r.address, latitude: r.latitude, longitude: r.longitude }))}
                   placeholder="Số nhà, đường, phường/xã..."
                 />
               </div>

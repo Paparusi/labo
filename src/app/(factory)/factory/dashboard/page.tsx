@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import ProfileCompleteness from '@/components/shared/ProfileCompleteness'
+import OnboardingModal from '@/components/shared/OnboardingModal'
 import {
   Briefcase, Users, FileText, TrendingUp, Plus,
   Clock, CheckCircle2, XCircle, AlertTriangle,
@@ -117,6 +118,8 @@ export default function FactoryDashboard() {
             </Button>
           </div>
         )}
+
+        <OnboardingModal role="factory" />
 
         {/* Profile Completeness */}
         <div className="mb-6">

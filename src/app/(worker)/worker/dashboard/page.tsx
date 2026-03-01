@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import ProfileCompleteness from '@/components/shared/ProfileCompleteness'
+import OnboardingModal from '@/components/shared/OnboardingModal'
 import { MapPin, List, Loader2, Navigation, AlertCircle, FileText, CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Job, WorkerProfile, Application } from '@/types'
@@ -144,6 +145,7 @@ export default function WorkerDashboard() {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
+      <OnboardingModal role="worker" />
       <div className="container mx-auto px-4 py-6 animate-fade-in-up">
         {/* Profile Completeness */}
         <div className="mb-6">
