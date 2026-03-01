@@ -61,6 +61,14 @@ export async function updateSession(request: NextRequest) {
 
     const role = profile?.role
 
+    // If role is unknown (no users row or DB error), don't redirect in circles
+    if (!role) {
+      if (path === '/login' || path === '/register') {
+        return supabaseResponse // let them stay on auth pages
+      }
+      return supabaseResponse // allow access, don't redirect
+    }
+
     // Redirect logged-in users away from auth pages
     if (path === '/login' || path === '/register') {
       const url = request.nextUrl.clone()
