@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { useSavedJobs } from '@/hooks/useSavedJobs'
 import Header from '@/components/layout/Header'
 import JobCard from '@/components/jobs/JobCard'
 import { Input } from '@/components/ui/input'
@@ -33,6 +34,7 @@ export default function WorkerJobsPage() {
   const [shiftFilter, setShiftFilter] = useState('all')
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set())
   const { latitude, longitude } = useGeolocation()
+  const { toggleSave, isSaved } = useSavedJobs()
   const supabase = createClient()
 
   useEffect(() => {
@@ -216,6 +218,8 @@ export default function WorkerJobsPage() {
                 job={job}
                 onApply={handleApply}
                 applied={appliedJobs.has(job.id)}
+                isSaved={isSaved(job.id)}
+                onToggleSave={toggleSave}
               />
             ))
           )}

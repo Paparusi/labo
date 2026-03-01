@@ -11,9 +11,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Plus, X, Save, Navigation } from 'lucide-react'
+import { Loader2, Plus, X, Save, Navigation, AlertTriangle } from 'lucide-react'
 import { useGeolocation } from '@/hooks/useGeolocation'
-import type { User } from '@/types'
+import { canPostJob } from '@/lib/subscription'
+import type { User, Subscription, SubscriptionPlan } from '@/types'
 
 const INDUSTRIES = [
   'electronics', 'garment', 'footwear', 'food',
@@ -34,6 +35,10 @@ const SKILL_OPTIONS = [
 export default function NewJobPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [plan, setPlan] = useState<SubscriptionPlan | null>(null)
+  const [activeJobCount, setActiveJobCount] = useState(0)
+  const [limitChecked, setLimitChecked] = useState(false)
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -59,6 +64,26 @@ export default function NewJobPage() {
       if (authUser) {
         const { data } = await supabase.from('users').select('*').eq('id', authUser.id).single()
         setUser(data)
+
+        // Check subscription limits
+        const { data: sub } = await supabase
+          .from('subscriptions')
+          .select('*, plan:subscription_plans(*)')
+          .eq('factory_id', authUser.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+        if (sub) {
+          setSubscription(sub)
+          setPlan(sub.plan)
+        }
+        const { count } = await supabase
+          .from('jobs')
+          .select('id', { count: 'exact', head: true })
+          .eq('factory_id', authUser.id)
+          .eq('status', 'active')
+        setActiveJobCount(count || 0)
+        setLimitChecked(true)
 
         // Get factory location as default
         const { data: factory } = await supabase
@@ -126,6 +151,22 @@ export default function NewJobPage() {
       <Header user={user} />
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Đăng tin tuyển dụng</h1>
+
+        {limitChecked && !canPostJob(subscription, plan, activeJobCount) && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-semibold text-amber-800">Đã đạt giới hạn đăng tin</p>
+              <p className="text-sm text-amber-700 mt-1">
+                Gói hiện tại cho phép tối đa {plan?.max_job_posts || 0} tin tuyển dụng đang hoạt động.
+                Bạn đang có {activeJobCount} tin. Vui lòng nâng cấp gói để đăng thêm.
+              </p>
+              <Button asChild size="sm" className="mt-3 bg-amber-600 hover:bg-amber-700">
+                <a href="/factory/subscription">Nâng cấp gói</a>
+              </Button>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={(e) => handleSubmit(e, 'active')} className="space-y-6">
           <Card>
@@ -286,7 +327,7 @@ export default function NewJobPage() {
             <Button
               type="submit"
               className="flex-1 bg-emerald-600 hover:bg-emerald-700"
-              disabled={loading}
+              disabled={loading || (limitChecked && !canPostJob(subscription, plan, activeJobCount))}
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
               Đăng tin tuyển

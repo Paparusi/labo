@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { MapPin, Clock, Banknote, Users, Building2 } from 'lucide-react'
+import { MapPin, Clock, Banknote, Users, Building2, Bookmark } from 'lucide-react'
 import { formatSalaryRange, getDistanceLabel } from '@/lib/geo'
 import type { Job } from '@/types'
 
@@ -15,6 +15,8 @@ interface JobCardProps {
   onApply?: (jobId: string) => void
   applied?: boolean
   linkPrefix?: string
+  isSaved?: boolean
+  onToggleSave?: (jobId: string) => void
 }
 
 const shiftLabels: Record<string, string> = {
@@ -31,6 +33,8 @@ export default function JobCard({
   onApply,
   applied = false,
   linkPrefix = '/worker/jobs',
+  isSaved = false,
+  onToggleSave,
 }: JobCardProps) {
   const distance = distanceKm ?? job._distance_km
   const distanceInfo = distance !== undefined ? getDistanceLabel(distance) : null
@@ -100,30 +104,53 @@ export default function JobCard({
             )}
           </div>
 
-          {/* Apply button */}
-          {showApplyButton && (
-            <div className="flex flex-col items-end gap-2">
+          {/* Right side actions */}
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2">
+              {/* Bookmark button */}
+              {onToggleSave && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    onToggleSave(job.id)
+                  }}
+                  className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                  aria-label={isSaved ? 'Bỏ lưu' : 'Lưu việc làm'}
+                >
+                  <Bookmark
+                    className={`h-5 w-5 ${
+                      isSaved
+                        ? 'fill-emerald-600 text-emerald-600'
+                        : 'text-gray-400 hover:text-emerald-600'
+                    }`}
+                  />
+                </button>
+              )}
               {distanceInfo && (
                 <span className="text-xs text-gray-400">{distanceInfo.transport}</span>
               )}
-              {applied ? (
-                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
-                  Đã ứng tuyển
-                </Badge>
-              ) : (
-                <Button
-                  size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700 whitespace-nowrap"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    onApply?.(job.id)
-                  }}
-                >
-                  Ứng tuyển
-                </Button>
-              )}
             </div>
-          )}
+            {showApplyButton && (
+              <>
+                {applied ? (
+                  <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
+                    Đã ứng tuyển
+                  </Badge>
+                ) : (
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 whitespace-nowrap"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      onApply?.(job.id)
+                    }}
+                  >
+                    Ứng tuyển
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

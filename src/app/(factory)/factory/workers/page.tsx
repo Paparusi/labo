@@ -11,7 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MapPin, List, Loader2, User, Star, MessageSquare } from 'lucide-react'
 import { getDistanceLabel } from '@/lib/geo'
-import type { User as UserType, FactoryProfile } from '@/types'
+import { getMaxRadius } from '@/lib/subscription'
+import type { User as UserType, FactoryProfile, SubscriptionPlan } from '@/types'
 
 interface NearbyWorker {
   id: string
@@ -37,6 +38,7 @@ export default function FactoryWorkersPage() {
   const [viewMode, setViewMode] = useState<'map' | 'list'>('list')
   const [radius, setRadius] = useState(10)
   const [availFilter, setAvailFilter] = useState('all')
+  const [maxRadius, setMaxRadius] = useState(50)
   const supabase = createClient()
 
   useEffect(() => {
@@ -47,6 +49,18 @@ export default function FactoryWorkersPage() {
       setUser(userData)
       const { data: factoryData } = await supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single()
       setFactory(factoryData)
+
+      // Get subscription plan to enforce radius limit
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('*, plan:subscription_plans(*)')
+        .eq('factory_id', authUser.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+      const planMaxRadius = getMaxRadius(sub?.plan as SubscriptionPlan | null)
+      setMaxRadius(planMaxRadius)
+      setRadius(Math.min(10, planMaxRadius))
     }
     fetchUser()
   }, [supabase])
@@ -128,10 +142,9 @@ export default function FactoryWorkersPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="5">5 km</SelectItem>
-                <SelectItem value="10">10 km</SelectItem>
-                <SelectItem value="20">20 km</SelectItem>
-                <SelectItem value="50">50 km</SelectItem>
+                {[5, 10, 20, 50].filter(r => r <= maxRadius).map(r => (
+                  <SelectItem key={r} value={String(r)}>{r} km</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <div className="flex bg-white border rounded-lg">

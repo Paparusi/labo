@@ -41,7 +41,10 @@ export default function LoginPage() {
       .eq('id', data.user.id)
       .single()
 
-    const redirectPath = profile?.role === 'factory' ? '/factory/dashboard' : '/worker/dashboard'
+    const redirectPath =
+      profile?.role === 'admin' ? '/admin' :
+      profile?.role === 'factory' ? '/factory/dashboard' :
+      '/worker/dashboard'
     router.push(redirectPath)
     router.refresh()
   }
@@ -86,6 +89,11 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <div className="mt-2 text-right">
+                <Link href="/forgot-password" className="text-sm text-emerald-600 hover:underline">
+                  Quên mật khẩu?
+                </Link>
+              </div>
             </div>
             <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}

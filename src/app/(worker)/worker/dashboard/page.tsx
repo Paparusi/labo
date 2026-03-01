@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { useSavedJobs } from '@/hooks/useSavedJobs'
 import Header from '@/components/layout/Header'
 import MapView from '@/components/map/MapView'
 import JobCard from '@/components/jobs/JobCard'
@@ -22,6 +23,7 @@ export default function WorkerDashboard() {
   const [radius, setRadius] = useState(5)
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set())
   const { latitude, longitude, error: geoError, loading: geoLoading, refresh: refreshGeo } = useGeolocation()
+  const { toggleSave, isSaved } = useSavedJobs()
   const supabase = createClient()
 
   // Fetch user
@@ -230,6 +232,8 @@ export default function WorkerDashboard() {
                     job={job}
                     onApply={handleApply}
                     applied={appliedJobs.has(job.id)}
+                    isSaved={isSaved(job.id)}
+                    onToggleSave={toggleSave}
                   />
                 ))
               )}
@@ -253,6 +257,8 @@ export default function WorkerDashboard() {
                   job={job}
                   onApply={handleApply}
                   applied={appliedJobs.has(job.id)}
+                  isSaved={isSaved(job.id)}
+                  onToggleSave={toggleSave}
                 />
               ))
             )}

@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Bell, Menu, X, MapPin, User, LogOut, Building2, Briefcase, ChevronDown, MessageSquare } from 'lucide-react'
+import { Bell, Menu, X, MapPin, User, LogOut, Building2, Briefcase, ChevronDown, MessageSquare, Bookmark } from 'lucide-react'
 import type { User as UserType } from '@/types'
 
 interface HeaderProps {
@@ -58,6 +58,9 @@ export default function Header({ user, unreadNotifications = 0, unreadMessages =
                 </Link>
                 <Link href="/worker/jobs" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
                   Tìm việc
+                </Link>
+                <Link href="/worker/saved-jobs" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
+                  Việc làm đã lưu
                 </Link>
                 <Link href="/worker/applications" className="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">
                   Đơn ứng tuyển
@@ -183,6 +186,7 @@ export default function Header({ user, unreadNotifications = 0, unreadMessages =
                 <>
                   <Link href="/worker/dashboard" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Bản đồ việc làm</Link>
                   <Link href="/worker/jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tìm việc</Link>
+                  <Link href="/worker/saved-jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Việc làm đã lưu</Link>
                   <Link href="/worker/applications" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Đơn ứng tuyển</Link>
                   <Link href="/worker/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tin nhắn</Link>
                   <Link href="/worker/profile" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Hồ sơ</Link>
