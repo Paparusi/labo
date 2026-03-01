@@ -1,26 +1,43 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Header from '@/components/layout/Header'
 import { useNotifications } from '@/hooks/useNotifications'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Bell, CheckCheck, Loader2, Briefcase, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
+import { Bell, CheckCheck, Loader2, Briefcase, CheckCircle2, XCircle, AlertTriangle, MessageSquare, Users } from 'lucide-react'
 import type { User, Notification } from '@/types'
 
 const ICON_MAP: Record<string, typeof Bell> = {
-  new_job_nearby: Briefcase,
+  new_application: Users,
   application_accepted: CheckCircle2,
   application_rejected: XCircle,
   trial_expiring: AlertTriangle,
+  new_message: MessageSquare,
+}
+
+function getNotificationHref(n: Notification): string | null {
+  const data = n.data as Record<string, unknown> | null
+  switch (n.type) {
+    case 'new_application':
+      return data?.job_id ? `/factory/jobs/${data.job_id}` : '/factory/jobs'
+    case 'trial_expiring':
+      return '/factory/subscription'
+    case 'new_message':
+      return data?.conversation_id ? `/factory/messages/${data.conversation_id}` : '/factory/messages'
+    default:
+      return null
+  }
 }
 
 export default function NotificationsPage() {
   const [user, setUser] = useState<User | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
@@ -73,7 +90,11 @@ export default function NotificationsPage() {
                 <Card
                   key={n.id}
                   className={`cursor-pointer transition-colors ${!n.is_read ? 'bg-emerald-50 border-emerald-200' : ''}`}
-                  onClick={() => !n.is_read && markAsRead(n.id)}
+                  onClick={() => {
+                    if (!n.is_read) markAsRead(n.id)
+                    const href = getNotificationHref(n)
+                    if (href) router.push(href)
+                  }}
                 >
                   <CardContent className="p-4 flex items-start gap-3">
                     <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${!n.is_read ? 'bg-emerald-100' : 'bg-gray-100'}`}>

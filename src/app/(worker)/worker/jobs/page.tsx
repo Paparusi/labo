@@ -32,6 +32,7 @@ export default function WorkerJobsPage() {
   const [industry, setIndustry] = useState('all')
   const [radius, setRadius] = useState(10)
   const [shiftFilter, setShiftFilter] = useState('all')
+  const [salaryMin, setSalaryMin] = useState('all')
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set())
   const { latitude, longitude } = useGeolocation()
   const { toggleSave, isSaved } = useSavedJobs()
@@ -77,6 +78,10 @@ export default function WorkerJobsPage() {
         if (shiftFilter !== 'all') {
           filtered = filtered.filter((j: Job) => j.shift_type === shiftFilter)
         }
+        if (salaryMin !== 'all') {
+          const minVal = Number(salaryMin)
+          filtered = filtered.filter((j: Job) => (j.salary_min ?? 0) >= minVal)
+        }
 
         setJobs(filtered)
       }
@@ -91,6 +96,7 @@ export default function WorkerJobsPage() {
 
       if (industry !== 'all') query = query.eq('industry', industry)
       if (shiftFilter !== 'all') query = query.eq('shift_type', shiftFilter)
+      if (salaryMin !== 'all') query = query.gte('salary_min', Number(salaryMin))
 
       const { data } = await query
 
@@ -110,7 +116,7 @@ export default function WorkerJobsPage() {
     }
 
     setLoading(false)
-  }, [latitude, longitude, radius, search, industry, shiftFilter, supabase])
+  }, [latitude, longitude, radius, search, industry, shiftFilter, salaryMin, supabase])
 
   useEffect(() => {
     fetchJobs()
@@ -223,6 +229,19 @@ export default function WorkerJobsPage() {
                 <SelectItem value="night">Ca đêm</SelectItem>
                 <SelectItem value="rotating">Ca xoay</SelectItem>
                 <SelectItem value="flexible">Linh hoạt</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={salaryMin} onValueChange={setSalaryMin}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Lương tối thiểu" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Mọi mức lương</SelectItem>
+                <SelectItem value="5000000">5 triệu+</SelectItem>
+                <SelectItem value="7000000">7 triệu+</SelectItem>
+                <SelectItem value="10000000">10 triệu+</SelectItem>
+                <SelectItem value="15000000">15 triệu+</SelectItem>
+                <SelectItem value="20000000">20 triệu+</SelectItem>
               </SelectContent>
             </Select>
             {latitude && longitude && (

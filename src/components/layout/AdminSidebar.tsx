@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutDashboard, Users, Briefcase, FileText, MapPin, LogOut } from 'lucide-react'
+import { LayoutDashboard, Users, Briefcase, FileText, Star, MapPin, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
@@ -12,6 +12,7 @@ const navItems = [
   { href: '/admin/users', label: 'Người dùng', icon: Users },
   { href: '/admin/jobs', label: 'Tin tuyển dụng', icon: Briefcase },
   { href: '/admin/applications', label: 'Đơn ứng tuyển', icon: FileText },
+  { href: '/admin/reviews', label: 'Đánh giá', icon: Star },
 ]
 
 export default function AdminSidebar() {
