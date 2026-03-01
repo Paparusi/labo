@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table'
 import {
   Users, HardHat, Building2, Briefcase,
-  CheckCircle2, FileText, MessageSquare, CreditCard, Loader2,
+  CheckCircle2, FileText, MessageSquare, CreditCard, Star, Loader2,
 } from 'lucide-react'
 import type { User, Job } from '@/types'
 
@@ -24,6 +24,7 @@ interface DashboardStats {
   totalApplications: number
   totalConversations: number
   activeSubscriptions: number
+  totalReviews: number
 }
 
 interface JobWithFactory extends Job {
@@ -39,6 +40,7 @@ const INITIAL_STATS: DashboardStats = {
   totalApplications: 0,
   totalConversations: 0,
   activeSubscriptions: 0,
+  totalReviews: 0,
 }
 
 function formatDate(dateString: string): string {
@@ -101,6 +103,7 @@ export default function AdminDashboard() {
         applicationsResult,
         conversationsResult,
         subscriptionsResult,
+        reviewsResult,
         recentUsersResult,
         recentJobsResult,
       ] = await Promise.all([
@@ -112,6 +115,7 @@ export default function AdminDashboard() {
         supabase.from('applications').select('*', { count: 'exact', head: true }),
         supabase.from('conversations').select('*', { count: 'exact', head: true }),
         supabase.from('subscriptions').select('*', { count: 'exact', head: true }).in('status', ['trial', 'active']),
+        supabase.from('reviews').select('*', { count: 'exact', head: true }),
         supabase.from('users').select('*').order('created_at', { ascending: false }).limit(10),
         supabase.from('jobs').select('*, factory_profiles!jobs_factory_id_fkey(company_name)').order('created_at', { ascending: false }).limit(10),
       ])
@@ -125,6 +129,7 @@ export default function AdminDashboard() {
         totalApplications: applicationsResult.count ?? 0,
         totalConversations: conversationsResult.count ?? 0,
         activeSubscriptions: subscriptionsResult.count ?? 0,
+        totalReviews: reviewsResult.count ?? 0,
       })
 
       if (recentUsersResult.data) setRecentUsers(recentUsersResult.data)
@@ -153,6 +158,7 @@ export default function AdminDashboard() {
     { label: 'Đơn ứng tuyển', value: stats.totalApplications, icon: FileText, color: 'text-amber-600 bg-amber-100' },
     { label: 'Cuộc trò chuyện', value: stats.totalConversations, icon: MessageSquare, color: 'text-pink-600 bg-pink-100' },
     { label: 'Gói dịch vụ hoạt động', value: stats.activeSubscriptions, icon: CreditCard, color: 'text-teal-600 bg-teal-100' },
+    { label: 'Đánh giá', value: stats.totalReviews, icon: Star, color: 'text-yellow-600 bg-yellow-100' },
   ]
 
   return (

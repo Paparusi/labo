@@ -182,7 +182,9 @@ export default function JobDetailPage() {
                         <User className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
-                        <p className="font-medium">{app.worker?.full_name || 'Ứng viên'}</p>
+                        <Link href={`/worker/${app.worker_id}`} className="font-medium hover:text-emerald-600">
+                          {app.worker?.full_name || 'Ứng viên'}
+                        </Link>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                           {app.worker?.experience_years !== undefined && (
                             <span>{app.worker.experience_years} năm KN</span>
