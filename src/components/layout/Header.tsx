@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useNotifications } from '@/hooks/useNotifications'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -18,14 +19,33 @@ import type { User as UserType } from '@/types'
 
 interface HeaderProps {
   user: UserType | null
-  unreadNotifications?: number
-  unreadMessages?: number
 }
 
-export default function Header({ user, unreadNotifications = 0, unreadMessages = 0 }: HeaderProps) {
+export default function Header({ user }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [unreadMessages, setUnreadMessages] = useState(0)
   const router = useRouter()
   const supabase = createClient()
+  const { unreadCount: unreadNotifications } = useNotifications(user?.id ?? null)
+
+  useEffect(() => {
+    async function fetchUnreadMessages() {
+      if (!user?.id) return
+      const { data } = await supabase.rpc('get_unread_message_count', { p_user_id: user.id })
+      if (data !== null) setUnreadMessages(Number(data) || 0)
+    }
+    fetchUnreadMessages()
+
+    if (!user?.id) return
+    const channel = supabase
+      .channel('header-messages')
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'messages',
+        filter: `receiver_id=eq.${user.id}`,
+      }, () => setUnreadMessages(prev => prev + 1))
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user?.id, supabase])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()

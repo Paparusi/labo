@@ -6,8 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Header from '@/components/layout/Header'
 import ConversationList from '@/components/messages/ConversationList'
 import ChatView from '@/components/messages/ChatView'
-import { useConversations, useUnreadMessages } from '@/hooks/useMessages'
-import { useNotifications } from '@/hooks/useNotifications'
+import { useConversations } from '@/hooks/useMessages'
 import { Loader2, MessageSquare } from 'lucide-react'
 import type { User } from '@/types'
 
@@ -41,8 +40,6 @@ export default function MessagesPageContent({ initialConversationId = null }: Me
   }, [supabase, router])
 
   const { conversations, loading: convsLoading } = useConversations(userId)
-  const { unreadCount: notifUnread } = useNotifications(userId)
-  const { unreadCount: msgUnread } = useUnreadMessages(userId)
 
   const activeConv = conversations.find(c => c.conversation_id === activeConversationId)
 
@@ -73,7 +70,7 @@ export default function MessagesPageContent({ initialConversationId = null }: Me
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} unreadNotifications={notifUnread} unreadMessages={msgUnread} />
+      <Header user={user} />
       <div className="container mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Tin nhắn</h1>
         <div className="flex gap-0 md:gap-4 h-[calc(100vh-12rem)] bg-white rounded-xl border overflow-hidden">

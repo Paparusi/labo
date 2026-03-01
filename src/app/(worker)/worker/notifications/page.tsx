@@ -49,7 +49,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} unreadNotifications={unreadCount} />
+      <Header user={user} />
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Thông báo</h1>
