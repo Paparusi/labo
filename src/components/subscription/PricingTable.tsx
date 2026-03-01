@@ -32,9 +32,9 @@ export default function PricingTable({
       {showTrialBanner && !currentPlanSlug && (
         <div className="mb-8 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 p-6 text-white text-center">
           <Sparkles className="h-8 w-8 mx-auto mb-2" />
-          <h3 className="text-xl font-bold">Dung thu mien phi 1 thang</h3>
+          <h3 className="text-xl font-bold">Dùng thử miễn phí 1 tháng</h3>
           <p className="mt-1 text-emerald-100">
-            Dang ky ngay de trai nghiem tat ca tinh nang. Khong can the tin dung.
+            Đăng ký ngay để trải nghiệm tất cả tính năng. Không cần thẻ tín dụng.
           </p>
         </div>
       )}
@@ -42,15 +42,15 @@ export default function PricingTable({
       {/* Toggle Monthly/Yearly */}
       <div className="flex items-center justify-center gap-3 mb-8">
         <span className={`text-sm font-medium ${!isYearly ? 'text-gray-900' : 'text-gray-500'}`}>
-          Theo thang
+          Theo tháng
         </span>
         <Switch checked={isYearly} onCheckedChange={setIsYearly} />
         <span className={`text-sm font-medium ${isYearly ? 'text-gray-900' : 'text-gray-500'}`}>
-          Theo nam
+          Theo năm
         </span>
         {isYearly && (
           <Badge className="bg-emerald-100 text-emerald-700 ml-2">
-            Tiet kiem 17%
+            Tiết kiệm 17%
           </Badge>
         )}
       </div>
@@ -70,14 +70,14 @@ export default function PricingTable({
               {isPro && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-emerald-600 text-white px-4">
-                    Pho bien nhat
+                    Phổ biến nhất
                   </Badge>
                 </div>
               )}
               {isCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-blue-600 text-white px-4">
-                    Goi hien tai
+                    Gói hiện tại
                   </Badge>
                 </div>
               )}
@@ -85,45 +85,45 @@ export default function PricingTable({
                 <CardTitle className="text-lg">{plan.name}</CardTitle>
                 <div className="mt-3">
                   <span className="text-3xl font-bold">
-                    {price === 0 ? 'Mien phi' : formatPrice(price)}
+                    {price === 0 ? 'Miễn phí' : formatPrice(price)}
                   </span>
                   {price > 0 && (
                     <span className="text-sm text-gray-500">
-                      /{isYearly ? 'nam' : 'thang'}
+                      /{isYearly ? 'năm' : 'tháng'}
                     </span>
                   )}
                 </div>
                 {plan.slug === 'trial' && (
-                  <p className="text-sm text-gray-500 mt-1">1 thang dung thu</p>
+                  <p className="text-sm text-gray-500 mt-1">1 tháng dùng thử</p>
                 )}
               </CardHeader>
               <CardContent className="pt-4">
                 <ul className="space-y-3">
                   <PlanFeature
-                    label="So tin tuyen"
-                    value={plan.max_job_posts === -1 ? 'Khong gioi han' : `${plan.max_job_posts} tin`}
+                    label="Số tin tuyển"
+                    value={plan.max_job_posts === -1 ? 'Không giới hạn' : `${plan.max_job_posts} tin`}
                     available
                   />
                   <PlanFeature
-                    label="Xem ho so"
-                    value={plan.max_view_profiles === -1 ? 'Khong gioi han' : `${plan.max_view_profiles} ho so`}
+                    label="Xem hồ sơ"
+                    value={plan.max_view_profiles === -1 ? 'Không giới hạn' : `${plan.max_view_profiles} hồ sơ`}
                     available
                   />
                   <PlanFeature
-                    label="Ban kinh tim kiem"
+                    label="Bán kính tìm kiếm"
                     value={`${plan.radius_km} km`}
                     available
                   />
                   <PlanFeature
-                    label="Phan tich du lieu"
+                    label="Phân tích dữ liệu"
                     available={plan.features?.analytics ?? false}
                   />
                   <PlanFeature
-                    label="Truy cap API"
+                    label="Truy cập API"
                     available={plan.features?.api_access ?? false}
                   />
                   <PlanFeature
-                    label="Ho tro uu tien"
+                    label="Hỗ trợ ưu tiên"
                     available={plan.features?.priority_support ?? false}
                   />
                 </ul>
@@ -139,7 +139,7 @@ export default function PricingTable({
                   disabled={isCurrent}
                   onClick={() => onSelectPlan?.(plan, isYearly ? 'yearly' : 'monthly')}
                 >
-                  {isCurrent ? 'Goi hien tai' : plan.slug === 'trial' ? 'Bat dau dung thu' : 'Chon goi nay'}
+                  {isCurrent ? 'Gói hiện tại' : plan.slug === 'trial' ? 'Bắt đầu dùng thử' : 'Chọn gói này'}
                 </Button>
               </CardContent>
             </Card>

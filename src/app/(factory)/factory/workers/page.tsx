@@ -47,18 +47,24 @@ export default function FactoryWorkersPage() {
   useEffect(() => {
     async function fetchUser() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) return
+      if (!authUser) { setLoading(false); return }
 
       const [factoryResult, subResult] = await Promise.all([
         supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single(),
         supabase.from('subscriptions').select('*, plan:subscription_plans(*)').eq('factory_id', authUser.id).order('created_at', { ascending: false }).limit(1).single(),
       ])
 
-      setFactory(factoryResult.data)
+      const fp = factoryResult.data
+      setFactory(fp)
 
       const planMaxRadius = getMaxRadius(subResult.data?.plan as SubscriptionPlan | null)
       setMaxRadius(planMaxRadius)
       setRadius(Math.min(10, planMaxRadius))
+
+      // If factory has no coordinates, stop loading (fetchWorkers won't run)
+      if (!fp?.latitude || !fp?.longitude) {
+        setLoading(false)
+      }
     }
     fetchUser()
   }, [supabase])

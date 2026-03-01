@@ -6,9 +6,9 @@ import Header from '@/components/layout/Header'
 import PricingTable from '@/components/subscription/PricingTable'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Loader2, Crown, Calendar, AlertTriangle } from 'lucide-react'
 import { isSubscriptionActive, getTrialDaysLeft, formatPrice, getPlanBadgeColor } from '@/lib/subscription'
+import { toast } from 'sonner'
 import type { Subscription, SubscriptionPlan } from '@/types'
 
 export default function SubscriptionPage() {
@@ -61,24 +61,51 @@ export default function SubscriptionPage() {
   }, [supabase])
 
   const handleSelectPlan = async (plan: SubscriptionPlan, interval: 'monthly' | 'yearly') => {
-    if (plan.slug === 'trial') return
+    if (plan.slug === 'trial') {
+      // Start trial
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) return
+      const { error } = await supabase.from('subscriptions').insert({
+        factory_id: authUser.id,
+        plan_id: plan.id,
+        status: 'trial',
+        start_date: new Date().toISOString(),
+        end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      })
+      if (error) {
+        toast.error('Không thể bắt đầu dùng thử')
+        return
+      }
+      toast.success('Đã bắt đầu dùng thử 1 tháng miễn phí!')
+      window.location.reload()
+      return
+    }
 
     const amount = interval === 'yearly' ? plan.price_yearly : plan.price_monthly
 
-    // Create payment via VNPay
-    const res = await fetch('/api/subscription/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        plan_id: plan.id,
-        interval,
-        amount,
-      }),
-    })
+    try {
+      const res = await fetch('/api/subscription/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_id: plan.id,
+          interval,
+          amount,
+        }),
+      })
 
-    const data = await res.json()
-    if (data.payment_url) {
-      window.location.href = data.payment_url
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error || 'Không thể tạo thanh toán')
+        return
+      }
+      if (data.payment_url) {
+        window.location.href = data.payment_url
+      } else {
+        toast.error('Không nhận được liên kết thanh toán')
+      }
+    } catch {
+      toast.error('Lỗi kết nối. Vui lòng thử lại.')
     }
   }
 
@@ -98,7 +125,7 @@ export default function SubscriptionPage() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Goi dich vu</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Gói dịch vụ</h1>
 
         {/* Current Plan Info */}
         {subscription && currentPlan && (
@@ -111,30 +138,30 @@ export default function SubscriptionPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold">Goi {currentPlan.name}</h3>
+                      <h3 className="text-lg font-semibold">Gói {currentPlan.name}</h3>
                       <Badge className={getPlanBadgeColor(currentPlan.slug)}>
-                        {subscription.status === 'trial' ? 'Dung thu' :
-                         subscription.status === 'active' ? 'Dang hoat dong' :
-                         subscription.status === 'expired' ? 'Het han' : 'Da huy'}
+                        {subscription.status === 'trial' ? 'Dùng thử' :
+                         subscription.status === 'active' ? 'Đang hoạt động' :
+                         subscription.status === 'expired' ? 'Hết hạn' : 'Đã hủy'}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
-                        Het han: {new Date(subscription.end_date).toLocaleDateString('vi-VN')}
+                        Hết hạn: {new Date(subscription.end_date).toLocaleDateString('vi-VN')}
                       </span>
                       {subscription.status === 'trial' && trialDays > 0 && (
                         <span className="flex items-center gap-1 text-amber-600">
                           <AlertTriangle className="h-3.5 w-3.5" />
-                          Con {trialDays} ngay dung thu
+                          Còn {trialDays} ngày dùng thử
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-500">Gioi han hien tai</p>
-                  <p className="text-sm">{currentPlan.max_job_posts === -1 ? 'Khong gioi han' : `${currentPlan.max_job_posts} tin tuyen`} | {currentPlan.radius_km}km</p>
+                  <p className="text-sm text-gray-500">Giới hạn hiện tại</p>
+                  <p className="text-sm">{currentPlan.max_job_posts === -1 ? 'Không giới hạn' : `${currentPlan.max_job_posts} tin tuyển`} | {currentPlan.radius_km}km</p>
                 </div>
               </div>
             </CardContent>
@@ -153,7 +180,7 @@ export default function SubscriptionPage() {
         {payments.length > 0 && (
           <Card className="mt-8">
             <CardHeader>
-              <CardTitle className="text-lg">Lich su thanh toan</CardTitle>
+              <CardTitle className="text-lg">Lịch sử thanh toán</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -168,7 +195,7 @@ export default function SubscriptionPage() {
                       p.status === 'failed' ? 'bg-red-100 text-red-700' :
                       'bg-yellow-100 text-yellow-700'
                     }>
-                      {p.status === 'success' ? 'Thanh cong' : p.status === 'failed' ? 'That bai' : 'Cho xu ly'}
+                      {p.status === 'success' ? 'Thành công' : p.status === 'failed' ? 'Thất bại' : 'Chờ xử lý'}
                     </Badge>
                   </div>
                 ))}
