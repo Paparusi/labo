@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   const paymentUrl = createPaymentUrl({
     orderId,
     amount,
-    orderInfo: `Labo - Goi ${plan?.name || 'dich vu'} (${interval})`,
+    orderInfo: `Labo - Gói ${plan?.name || 'dịch vụ'} (${interval})`,
     ipAddr: ip.split(',')[0].trim(),
   })
 

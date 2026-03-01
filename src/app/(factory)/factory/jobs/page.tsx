@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus, Users, Clock, MapPin, Eye, Trash2, Pencil } from 'lucide-react'
 import { JobListSkeleton } from '@/components/shared/PageSkeleton'
 import { toast } from 'sonner'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { formatSalaryRange } from '@/lib/geo'
 import { Loader2 } from 'lucide-react'
 import type { Job } from '@/types'
@@ -28,6 +29,7 @@ export default function FactoryJobsPage() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -62,14 +64,15 @@ export default function FactoryJobsPage() {
     toast.success(newStatus === 'active' ? 'Đã mở lại tin tuyển dụng' : 'Đã đóng tin tuyển dụng')
   }
 
-  const deleteJob = async (jobId: string) => {
-    if (!confirm('Bạn có chắc muốn xóa tin tuyển dụng này?')) return
-    const { error } = await supabase.from('jobs').delete().eq('id', jobId)
+  const deleteJob = async () => {
+    if (!deleteId) return
+    const { error } = await supabase.from('jobs').delete().eq('id', deleteId)
     if (error) {
       toast.error('Không thể xóa tin tuyển dụng')
       return
     }
-    setJobs(prev => prev.filter(j => j.id !== jobId))
+    setJobs(prev => prev.filter(j => j.id !== deleteId))
+    setDeleteId(null)
     toast.success('Đã xóa tin tuyển dụng')
   }
 
@@ -81,13 +84,23 @@ export default function FactoryJobsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 animate-fade-in-up">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Tin tuyển dụng</h1>
           <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
             <Link href="/factory/jobs/new"><Plus className="h-4 w-4 mr-2" />Đăng tin mới</Link>
           </Button>
         </div>
+
+        <ConfirmDialog
+          open={!!deleteId}
+          onOpenChange={(open) => { if (!open) setDeleteId(null) }}
+          title="Xóa tin tuyển dụng"
+          description="Bạn có chắc muốn xóa tin tuyển dụng này? Hành động này không thể hoàn tác."
+          confirmLabel="Xóa"
+          variant="destructive"
+          onConfirm={deleteJob}
+        />
 
         {loading ? (
           <JobListSkeleton />
@@ -112,7 +125,7 @@ export default function FactoryJobsPage() {
                 ) : (
                   <>
                     {filterByStatus(tab).slice(0, displayCount).map(job => (
-                      <Card key={job.id} className="hover:shadow-md transition-shadow">
+                      <Card key={job.id} className="hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -161,7 +174,7 @@ export default function FactoryJobsPage() {
                                 </Button>
                               ) : null}
                               {job.status === 'draft' && (
-                                <Button variant="ghost" size="sm" className="text-red-600" onClick={() => deleteJob(job.id)}>
+                                <Button variant="ghost" size="sm" className="text-red-600" onClick={() => setDeleteId(job.id)}>
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               )}

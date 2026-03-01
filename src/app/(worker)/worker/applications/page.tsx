@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Building2, MapPin, Banknote, Clock, Loader2, Star } from 'lucide-react'
 import { toast } from 'sonner'
 import ReviewForm from '@/components/shared/ReviewForm'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { formatSalaryRange } from '@/lib/geo'
 import type { Application } from '@/types'
 
@@ -26,6 +27,7 @@ export default function WorkerApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
   const [reviewingFactory, setReviewingFactory] = useState<string | null>(null)
+  const [withdrawId, setWithdrawId] = useState<string | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -53,14 +55,15 @@ export default function WorkerApplicationsPage() {
     fetchData()
   }, [supabase])
 
-  const handleWithdraw = async (appId: string) => {
-    if (!confirm('Bạn có chắc muốn rút đơn ứng tuyển này?')) return
-    const { error } = await supabase.from('applications').update({ status: 'withdrawn' }).eq('id', appId)
+  const handleWithdraw = async () => {
+    if (!withdrawId) return
+    const { error } = await supabase.from('applications').update({ status: 'withdrawn' }).eq('id', withdrawId)
     if (error) {
       toast.error('Không thể rút đơn ứng tuyển')
       return
     }
-    setApplications(prev => prev.map(a => a.id === appId ? { ...a, status: 'withdrawn' } : a))
+    setApplications(prev => prev.map(a => a.id === withdrawId ? { ...a, status: 'withdrawn' } : a))
+    setWithdrawId(null)
     toast.success('Đã rút đơn ứng tuyển')
   }
 
@@ -95,7 +98,7 @@ export default function WorkerApplicationsPage() {
                     <div className="text-center py-12 text-gray-500">Không có đơn ứng tuyển nào</div>
                   ) : (
                     filterByStatus(tab).map(app => (
-                      <Card key={app.id} className="hover:shadow-md transition-shadow">
+                      <Card key={app.id} className="hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -129,7 +132,7 @@ export default function WorkerApplicationsPage() {
                                 {STATUS_CONFIG[app.status]?.label}
                               </Badge>
                               {app.status === 'pending' && (
-                                <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleWithdraw(app.id)}>
+                                <Button variant="ghost" size="sm" className="text-red-600" onClick={() => setWithdrawId(app.id)}>
                                   Rút đơn
                                 </Button>
                               )}
@@ -152,6 +155,16 @@ export default function WorkerApplicationsPage() {
                 </TabsContent>
               ))}
             </Tabs>
+
+            <ConfirmDialog
+              open={!!withdrawId}
+              onOpenChange={(open) => { if (!open) setWithdrawId(null) }}
+              title="Rút đơn ứng tuyển"
+              description="Bạn có chắc muốn rút đơn ứng tuyển này? Hành động này không thể hoàn tác."
+              confirmLabel="Rút đơn"
+              variant="destructive"
+              onConfirm={handleWithdraw}
+            />
 
             {reviewingFactory && (
               <div className="mt-6 p-4 border rounded-lg bg-gray-50">

@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { useDebounce } from '@/hooks/useDebounce'
 import { useSavedJobs } from '@/hooks/useSavedJobs'
 import Header from '@/components/layout/Header'
 import JobCard from '@/components/jobs/JobCard'
@@ -31,20 +33,36 @@ const INDUSTRIES = [
 ]
 
 export default function WorkerJobsPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const [industry, setIndustry] = useState('all')
-  const [radius, setRadius] = useState(10)
-  const [shiftFilter, setShiftFilter] = useState('all')
-  const [salaryMin, setSalaryMin] = useState('all')
-  const [sortBy, setSortBy] = useState('newest')
+  const [search, setSearch] = useState(searchParams.get('q') || '')
+  const [industry, setIndustry] = useState(searchParams.get('industry') || 'all')
+  const [radius, setRadius] = useState(Number(searchParams.get('radius')) || 10)
+  const [shiftFilter, setShiftFilter] = useState(searchParams.get('shift') || 'all')
+  const [salaryMin, setSalaryMin] = useState(searchParams.get('salary') || 'all')
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest')
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE)
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set())
   const { latitude, longitude } = useGeolocation()
   const { toggleSave, isSaved } = useSavedJobs()
   const supabase = createClient()
+  const debouncedSearch = useDebounce(search, 300)
+
+  // Sync filters to URL params
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (debouncedSearch) params.set('q', debouncedSearch)
+    if (industry !== 'all') params.set('industry', industry)
+    if (radius !== 10) params.set('radius', String(radius))
+    if (shiftFilter !== 'all') params.set('shift', shiftFilter)
+    if (salaryMin !== 'all') params.set('salary', salaryMin)
+    if (sortBy !== 'newest') params.set('sort', sortBy)
+    const qs = params.toString()
+    router.replace(`/worker/jobs${qs ? `?${qs}` : ''}`, { scroll: false })
+  }, [debouncedSearch, industry, radius, shiftFilter, salaryMin, sortBy, router])
 
   const fetchJobs = useCallback(async () => {
     setLoading(true)
@@ -63,8 +81,8 @@ export default function WorkerJobsPage() {
           _distance_km: j.distance_km,
         }))
 
-        if (search) {
-          const q = search.toLowerCase()
+        if (debouncedSearch) {
+          const q = debouncedSearch.toLowerCase()
           filtered = filtered.filter((j: Job) =>
             j.title.toLowerCase().includes(q) ||
             j.factory?.company_name?.toLowerCase().includes(q)
@@ -110,8 +128,8 @@ export default function WorkerJobsPage() {
           ...j,
           factory: (j as Record<string, unknown>).factory_profiles,
         })) as unknown as Job[]
-        if (search) {
-          const q = search.toLowerCase()
+        if (debouncedSearch) {
+          const q = debouncedSearch.toLowerCase()
           filtered = filtered.filter((j) =>
             j.title.toLowerCase().includes(q)
           )
@@ -124,7 +142,7 @@ export default function WorkerJobsPage() {
     }
 
     setLoading(false)
-  }, [latitude, longitude, radius, search, industry, shiftFilter, salaryMin, sortBy, supabase])
+  }, [latitude, longitude, radius, debouncedSearch, industry, shiftFilter, salaryMin, sortBy, supabase])
 
   useEffect(() => {
     fetchJobs()
@@ -206,7 +224,7 @@ export default function WorkerJobsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 animate-fade-in-up">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Tìm việc làm</h1>
 
         {/* Filters */}

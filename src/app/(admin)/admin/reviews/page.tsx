@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Star, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import StarRating from '@/components/shared/StarRating'
 
 const REVIEWS_PER_PAGE = 20
@@ -33,6 +34,7 @@ export default function AdminReviewsPage() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(0)
   const [ratingFilter, setRatingFilter] = useState('all')
+  const [deleteReviewId, setDeleteReviewId] = useState<string | null>(null)
   const supabase = createClient()
 
   const fetchReviews = useCallback(async () => {
@@ -102,15 +104,16 @@ export default function AdminReviewsPage() {
     fetchReviews()
   }, [fetchReviews])
 
-  const handleDelete = async (reviewId: string) => {
-    if (!confirm('Bạn có chắc muốn xóa đánh giá này?')) return
-    const { error } = await supabase.from('reviews').delete().eq('id', reviewId)
+  const handleDelete = async () => {
+    if (!deleteReviewId) return
+    const { error } = await supabase.from('reviews').delete().eq('id', deleteReviewId)
     if (error) {
       toast.error('Không thể xóa đánh giá')
       return
     }
-    setReviews(prev => prev.filter(r => r.id !== reviewId))
+    setReviews(prev => prev.filter(r => r.id !== deleteReviewId))
     setTotal(prev => prev - 1)
+    setDeleteReviewId(null)
     toast.success('Đã xóa đánh giá')
   }
 
@@ -145,6 +148,16 @@ export default function AdminReviewsPage() {
             </SelectContent>
           </Select>
         </div>
+
+        <ConfirmDialog
+          open={!!deleteReviewId}
+          onOpenChange={(open) => { if (!open) setDeleteReviewId(null) }}
+          title="Xóa đánh giá"
+          description="Bạn có chắc muốn xóa đánh giá này? Hành động này không thể hoàn tác."
+          confirmLabel="Xóa"
+          variant="destructive"
+          onConfirm={handleDelete}
+        />
 
         {loading ? (
           <div className="flex items-center justify-center h-32">
@@ -196,7 +209,7 @@ export default function AdminReviewsPage() {
                         variant="ghost"
                         size="sm"
                         className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDelete(review.id)}
+                        onClick={() => setDeleteReviewId(review.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -141,7 +141,7 @@ export default function WorkerProfilePage() {
                   onChange={(e) => setProfile(prev => ({ ...prev, full_name: e.target.value }))}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Ngày sinh</Label>
                   <Input
@@ -237,7 +237,7 @@ export default function WorkerProfilePage() {
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Kinh nghiệm (năm)</Label>
                   <Input

@@ -33,7 +33,7 @@ export default function MapView({
   radiusKm,
   showUserLocation = true,
   userLocation,
-  className = 'w-full h-[500px]',
+  className = 'w-full h-[300px] sm:h-[400px] lg:h-[500px]',
   onMapClick,
 }: MapViewProps) {
   const mapContainer = useRef<HTMLDivElement>(null)

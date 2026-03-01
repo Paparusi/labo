@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import Header from '@/components/layout/Header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -129,7 +130,7 @@ export default function FactoryProfilePage() {
             <div className="flex items-start gap-4">
               <div className="shrink-0">
                 {factory.logo_url ? (
-                  <img src={factory.logo_url} alt={factory.company_name} className="h-16 w-16 rounded-lg object-cover border" />
+                  <Image src={factory.logo_url} alt={factory.company_name} width={64} height={64} className="h-16 w-16 rounded-lg object-cover border" />
                 ) : (
                   <div className="h-16 w-16 rounded-lg bg-emerald-100 flex items-center justify-center">
                     <Building2 className="h-8 w-8 text-emerald-600" />

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useSavedJobs } from '@/hooks/useSavedJobs'
 import Header from '@/components/layout/Header'
@@ -135,7 +136,7 @@ export default function WorkerJobDetailPage() {
             <div className="flex items-start gap-4">
               <div className="h-14 w-14 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
                 {factory?.logo_url ? (
-                  <img src={factory.logo_url} alt="" className="h-14 w-14 rounded-xl object-cover" />
+                  <Image src={factory.logo_url} alt="" width={56} height={56} className="h-14 w-14 rounded-xl object-cover" />
                 ) : (
                   <Building2 className="h-7 w-7 text-amber-700" />
                 )}

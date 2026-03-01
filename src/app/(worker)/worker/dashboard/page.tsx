@@ -144,7 +144,7 @@ export default function WorkerDashboard() {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 animate-fade-in-up">
         {/* Profile Completeness */}
         <div className="mb-6">
           <ProfileCompleteness role="worker" workerProfile={workerProfile} />
@@ -277,7 +277,7 @@ export default function WorkerDashboard() {
                 markers={mapMarkers}
                 radiusKm={radius}
                 userLocation={latitude && longitude ? { latitude, longitude } : null}
-                className="w-full h-[500px] lg:h-[600px]"
+                className="w-full h-[300px] sm:h-[400px] lg:h-[600px]"
               />
             </div>
 

@@ -191,7 +191,7 @@ export default function NewJobPage() {
                   rows={4}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Ngành nghề</Label>
                   <Select value={form.industry} onValueChange={(v) => setForm(prev => ({ ...prev, industry: v }))}>
@@ -219,7 +219,7 @@ export default function NewJobPage() {
           <Card>
             <CardHeader><CardTitle className="text-lg">Lương & Ca làm</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Lương tối thiểu (VND)</Label>
                   <Input
@@ -239,7 +239,7 @@ export default function NewJobPage() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Ca làm việc</Label>
                   <Select value={form.shift_type} onValueChange={(v) => setForm(prev => ({ ...prev, shift_type: v }))}>

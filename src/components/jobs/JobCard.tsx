@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -40,14 +41,14 @@ export default function JobCard({
   const distanceInfo = distance !== undefined ? getDistanceLabel(distance) : null
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             {/* Company */}
             <div className="flex items-center gap-2 mb-1">
               {job.factory?.logo_url ? (
-                <img src={job.factory.logo_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                <Image src={job.factory.logo_url} alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
               ) : (
                 <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center">
                   <Building2 className="h-4 w-4 text-amber-700" />

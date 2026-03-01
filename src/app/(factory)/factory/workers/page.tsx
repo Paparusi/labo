@@ -148,13 +148,13 @@ export default function FactoryWorkersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="container mx-auto px-4 py-6 animate-fade-in-up">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Công nhân gần nhà máy</h1>
             <p className="text-sm text-gray-500 mt-1">Tìm công nhân phù hợp trong khu vực của bạn</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Select value={availFilter} onValueChange={setAvailFilter}>
               <SelectTrigger className="w-36">
                 <SelectValue placeholder="Khả dụng" />
@@ -214,14 +214,14 @@ export default function FactoryWorkersPage() {
             markers={mapMarkers}
             radiusKm={radius}
             userLocation={{ latitude: factory.latitude!, longitude: factory.longitude! }}
-            className="w-full h-[600px]"
+            className="w-full h-[300px] sm:h-[400px] lg:h-[600px]"
           />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {workers.map(worker => {
               const distInfo = getDistanceLabel(worker.distance_km)
               return (
-                <Card key={worker.id} className="hover:shadow-md transition-shadow">
+                <Card key={worker.id} className="hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">

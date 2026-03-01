@@ -1,7 +1,7 @@
 'use client'
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded bg-gray-200 ${className}`} />
+  return <div className={`rounded animate-shimmer ${className}`} />
 }
 
 export function DashboardSkeleton() {

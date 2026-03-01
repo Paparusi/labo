@@ -112,7 +112,7 @@ export default function FactoryProfilePage() {
                 <Label>Tên công ty *</Label>
                 <Input value={profile.company_name || ''} onChange={(e) => setProfile(prev => ({ ...prev, company_name: e.target.value }))} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Ngành nghề</Label>
                   <Select value={profile.industry || ''} onValueChange={(v) => setProfile(prev => ({ ...prev, industry: v }))}>
@@ -138,7 +138,7 @@ export default function FactoryProfilePage() {
                 <Label>Mô tả công ty</Label>
                 <Textarea value={profile.description || ''} onChange={(e) => setProfile(prev => ({ ...prev, description: e.target.value }))} rows={3} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Người liên hệ</Label>
                   <Input value={profile.contact_person || ''} onChange={(e) => setProfile(prev => ({ ...prev, contact_person: e.target.value }))} />
