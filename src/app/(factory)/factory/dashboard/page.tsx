@@ -7,15 +7,17 @@ import Header from '@/components/layout/Header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import ProfileCompleteness from '@/components/shared/ProfileCompleteness'
 import {
   Briefcase, Users, FileText, TrendingUp, Plus,
   Clock, CheckCircle2, XCircle, Loader2, AlertTriangle,
 } from 'lucide-react'
 import { isSubscriptionActive, getTrialDaysLeft } from '@/lib/subscription'
-import type { User, Subscription, SubscriptionPlan } from '@/types'
+import type { User, Subscription, SubscriptionPlan, FactoryProfile } from '@/types'
 
 export default function FactoryDashboard() {
   const [user, setUser] = useState<User | null>(null)
+  const [factoryProfile, setFactoryProfile] = useState<FactoryProfile | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null)
   const [stats, setStats] = useState({
@@ -36,6 +38,10 @@ export default function FactoryDashboard() {
 
       const { data: userData } = await supabase.from('users').select('*').eq('id', authUser.id).single()
       setUser(userData)
+
+      // Fetch factory profile
+      const { data: fpData } = await supabase.from('factory_profiles').select('*').eq('user_id', authUser.id).single()
+      if (fpData) setFactoryProfile(fpData)
 
       // Fetch subscription
       const { data: subData } = await supabase
@@ -138,6 +144,11 @@ export default function FactoryDashboard() {
             </Button>
           </div>
         )}
+
+        {/* Profile Completeness */}
+        <div className="mb-6">
+          <ProfileCompleteness role="factory" factoryProfile={factoryProfile} />
+        </div>
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

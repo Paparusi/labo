@@ -9,11 +9,13 @@ import JobCard from '@/components/jobs/JobCard'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import ProfileCompleteness from '@/components/shared/ProfileCompleteness'
 import { MapPin, List, Loader2, Navigation, AlertCircle } from 'lucide-react'
-import type { User, Job } from '@/types'
+import type { User, Job, WorkerProfile } from '@/types'
 
 export default function WorkerDashboard() {
   const [user, setUser] = useState<User | null>(null)
+  const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
@@ -29,6 +31,9 @@ export default function WorkerDashboard() {
       if (authUser) {
         const { data } = await supabase.from('users').select('*').eq('id', authUser.id).single()
         setUser(data)
+
+        const { data: wpData } = await supabase.from('worker_profiles').select('*').eq('user_id', authUser.id).single()
+        if (wpData) setWorkerProfile(wpData)
       }
     }
     fetchUser()
@@ -116,6 +121,11 @@ export default function WorkerDashboard() {
       <Header user={user} />
 
       <div className="container mx-auto px-4 py-6">
+        {/* Profile Completeness */}
+        <div className="mb-6">
+          <ProfileCompleteness role="worker" workerProfile={workerProfile} />
+        </div>
+
         {/* Title Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div>
