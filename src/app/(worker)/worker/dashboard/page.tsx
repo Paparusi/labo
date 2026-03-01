@@ -7,12 +7,14 @@ import { useSavedJobs } from '@/hooks/useSavedJobs'
 import Header from '@/components/layout/Header'
 import MapView from '@/components/map/MapView'
 import JobCard from '@/components/jobs/JobCard'
+import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import ProfileCompleteness from '@/components/shared/ProfileCompleteness'
-import { MapPin, List, Loader2, Navigation, AlertCircle } from 'lucide-react'
-import type { User, Job, WorkerProfile } from '@/types'
+import { MapPin, List, Loader2, Navigation, AlertCircle, FileText, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import type { User, Job, WorkerProfile, Application } from '@/types'
 
 export default function WorkerDashboard() {
   const [user, setUser] = useState<User | null>(null)
@@ -22,6 +24,8 @@ export default function WorkerDashboard() {
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
   const [radius, setRadius] = useState(5)
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set())
+  const [recentApps, setRecentApps] = useState<Record<string, unknown>[]>([])
+  const [appStats, setAppStats] = useState({ pending: 0, accepted: 0, rejected: 0 })
   const { latitude, longitude, error: geoError, loading: geoLoading, refresh: refreshGeo } = useGeolocation()
   const { toggleSave, isSaved } = useSavedJobs()
   const supabase = createClient()
@@ -66,18 +70,32 @@ export default function WorkerDashboard() {
     fetchJobs()
   }, [fetchJobs])
 
-  // Fetch applied jobs
+  // Fetch applied jobs + recent applications
   useEffect(() => {
     async function fetchApplied() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
       const { data } = await supabase
         .from('applications')
-        .select('job_id')
+        .select('job_id, status')
         .eq('worker_id', authUser.id)
       if (data) {
         setAppliedJobs(new Set(data.map(a => a.job_id)))
+        setAppStats({
+          pending: data.filter(a => a.status === 'pending').length,
+          accepted: data.filter(a => a.status === 'accepted').length,
+          rejected: data.filter(a => a.status === 'rejected').length,
+        })
       }
+
+      // Recent 3 applications with job title
+      const { data: recent } = await supabase
+        .from('applications')
+        .select('*, jobs(title, factory_profiles!jobs_factory_id_fkey(company_name))')
+        .eq('worker_id', authUser.id)
+        .order('applied_at', { ascending: false })
+        .limit(3)
+      if (recent) setRecentApps(recent)
     }
     fetchApplied()
   }, [supabase])
@@ -126,6 +144,56 @@ export default function WorkerDashboard() {
         {/* Profile Completeness */}
         <div className="mb-6">
           <ProfileCompleteness role="worker" workerProfile={workerProfile} />
+        </div>
+
+        {/* Application Stats + Recent */}
+        <div className="grid sm:grid-cols-4 gap-4 mb-6">
+          {[
+            { label: 'Đang chờ', value: appStats.pending, icon: Clock, color: 'text-amber-600 bg-amber-100' },
+            { label: 'Đã nhận', value: appStats.accepted, icon: CheckCircle2, color: 'text-green-600 bg-green-100' },
+            { label: 'Từ chối', value: appStats.rejected, icon: XCircle, color: 'text-red-600 bg-red-100' },
+          ].map(s => (
+            <Card key={s.label}>
+              <CardContent className="p-3 flex items-center gap-3">
+                <div className={`h-9 w-9 rounded-lg ${s.color} flex items-center justify-center`}>
+                  <s.icon className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-gray-900">{s.value}</p>
+                  <p className="text-xs text-gray-500">{s.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          <Card>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-gray-500">Gần đây</span>
+                <Link href="/worker/applications" className="text-xs text-emerald-600 hover:underline">Xem tất cả</Link>
+              </div>
+              {recentApps.length === 0 ? (
+                <p className="text-xs text-gray-400">Chưa ứng tuyển</p>
+              ) : (
+                <div className="space-y-1">
+                  {recentApps.map((app: Record<string, unknown>) => (
+                    <div key={app.id as string} className="flex items-center justify-between">
+                      <span className="text-xs text-gray-700 truncate max-w-[120px]">
+                        {(app.jobs as Record<string, unknown>)?.title as string || 'Việc làm'}
+                      </span>
+                      <Badge className={`text-[10px] py-0 px-1.5 ${
+                        app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                        app.status === 'accepted' ? 'bg-green-100 text-green-700' :
+                        app.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {app.status === 'pending' ? 'Chờ' : app.status === 'accepted' ? 'Nhận' : app.status === 'rejected' ? 'Từ chối' : String(app.status)}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Title Bar */}

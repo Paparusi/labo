@@ -9,7 +9,7 @@ import JobCard from '@/components/jobs/JobCard'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Search, Loader2, SlidersHorizontal } from 'lucide-react'
+import { Search, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react'
 import type { User, Job } from '@/types'
 
 const INDUSTRIES = [
@@ -33,6 +33,7 @@ export default function WorkerJobsPage() {
   const [radius, setRadius] = useState(10)
   const [shiftFilter, setShiftFilter] = useState('all')
   const [salaryMin, setSalaryMin] = useState('all')
+  const [sortBy, setSortBy] = useState('newest')
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set())
   const { latitude, longitude } = useGeolocation()
   const { toggleSave, isSaved } = useSavedJobs()
@@ -83,6 +84,13 @@ export default function WorkerJobsPage() {
           filtered = filtered.filter((j: Job) => (j.salary_min ?? 0) >= minVal)
         }
 
+        // Sort
+        if (sortBy === 'salary_desc') {
+          filtered.sort((a: Job, b: Job) => (b.salary_min ?? 0) - (a.salary_min ?? 0))
+        } else if (sortBy === 'distance') {
+          filtered.sort((a: Job, b: Job) => (a._distance_km ?? 999) - (b._distance_km ?? 999))
+        }
+
         setJobs(filtered)
       }
     } else {
@@ -111,12 +119,15 @@ export default function WorkerJobsPage() {
             j.title.toLowerCase().includes(q)
           )
         }
+        if (sortBy === 'salary_desc') {
+          filtered.sort((a, b) => (b.salary_min ?? 0) - (a.salary_min ?? 0))
+        }
         setJobs(filtered)
       }
     }
 
     setLoading(false)
-  }, [latitude, longitude, radius, search, industry, shiftFilter, salaryMin, supabase])
+  }, [latitude, longitude, radius, search, industry, shiftFilter, salaryMin, sortBy, supabase])
 
   useEffect(() => {
     fetchJobs()
@@ -260,9 +271,22 @@ export default function WorkerJobsPage() {
           </div>
         </div>
 
-        <Badge variant="secondary" className="mb-4">
-          {jobs.length} việc làm
-        </Badge>
+        <div className="flex items-center gap-3 mb-4">
+          <Badge variant="secondary">
+            {jobs.length} việc làm
+          </Badge>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-40 h-8 text-xs">
+              <ArrowUpDown className="h-3 w-3 mr-1" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Mới nhất</SelectItem>
+              <SelectItem value="salary_desc">Lương cao nhất</SelectItem>
+              {latitude && longitude && <SelectItem value="distance">Gần nhất</SelectItem>}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Job List */}
         <div className="space-y-3 max-w-3xl">
