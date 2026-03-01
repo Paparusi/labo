@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Loader2, Crown, Calendar, AlertTriangle } from 'lucide-react'
 import { isSubscriptionActive, getTrialDaysLeft, formatPrice, getPlanBadgeColor } from '@/lib/subscription'
 import { toast } from 'sonner'
+import BankTransferModal from '@/components/subscription/BankTransferModal'
 import type { Subscription, SubscriptionPlan } from '@/types'
 
 export default function SubscriptionPage() {
@@ -17,6 +18,7 @@ export default function SubscriptionPage() {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
   const [payments, setPayments] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
+  const [modalPlan, setModalPlan] = useState<{ plan: SubscriptionPlan; interval: 'monthly' | 'yearly' } | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -81,32 +83,8 @@ export default function SubscriptionPage() {
       return
     }
 
-    const amount = interval === 'yearly' ? plan.price_yearly : plan.price_monthly
-
-    try {
-      const res = await fetch('/api/subscription/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan_id: plan.id,
-          interval,
-          amount,
-        }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) {
-        toast.error(data.error || 'Không thể tạo thanh toán')
-        return
-      }
-      if (data.payment_url) {
-        window.location.href = data.payment_url
-      } else {
-        toast.error('Không nhận được liên kết thanh toán')
-      }
-    } catch {
-      toast.error('Lỗi kết nối. Vui lòng thử lại.')
-    }
+    // Open bank transfer modal
+    setModalPlan({ plan, interval })
   }
 
   const trialDays = getTrialDaysLeft(subscription)
@@ -189,13 +167,17 @@ export default function SubscriptionPage() {
                     <div>
                       <p className="font-medium text-sm">{formatPrice(p.amount as number)}</p>
                       <p className="text-xs text-gray-500">{new Date(p.created_at as string).toLocaleDateString('vi-VN')}</p>
+                      {(() => {
+                        const note = p.transfer_note as string | null
+                        return note ? <p className="text-xs text-gray-400 font-mono">{note}</p> : null
+                      })()}
                     </div>
                     <Badge className={
                       p.status === 'success' ? 'bg-green-100 text-green-700' :
                       p.status === 'failed' ? 'bg-red-100 text-red-700' :
                       'bg-yellow-100 text-yellow-700'
                     }>
-                      {p.status === 'success' ? 'Thành công' : p.status === 'failed' ? 'Thất bại' : 'Chờ xử lý'}
+                      {p.status === 'success' ? 'Thành công' : p.status === 'failed' ? 'Thất bại' : 'Chờ xác nhận'}
                     </Badge>
                   </div>
                 ))}
@@ -204,6 +186,20 @@ export default function SubscriptionPage() {
           </Card>
         )}
       </div>
+
+      {/* Bank Transfer Modal */}
+      {modalPlan && (
+        <BankTransferModal
+          open={!!modalPlan}
+          onOpenChange={(open) => { if (!open) setModalPlan(null) }}
+          plan={modalPlan.plan}
+          interval={modalPlan.interval}
+          onSuccess={() => {
+            // Refresh payment history
+            window.location.reload()
+          }}
+        />
+      )}
     </div>
   )
 }

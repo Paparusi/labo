@@ -18,7 +18,7 @@ import {
 import {
   Bell, Menu, X, MapPin, User, LogOut, Building2, Briefcase,
   ChevronDown, MessageSquare, HardHat, Shield, Settings,
-  FileText, GitBranch, BarChart3,
+  FileText, GitBranch, BarChart3, CreditCard,
 } from 'lucide-react'
 
 /* ─────────────────────────────────────────────
@@ -95,7 +95,10 @@ const ROLE_CONFIG: Record<string, {
     notifications: null,
     profile: null,
     home: '/admin',
-    extra: [],
+    extra: [
+      { href: '/admin/payments', label: 'Thanh toán', Icon: CreditCard },
+      { href: '/admin/settings', label: 'Cài đặt', Icon: Settings },
+    ],
   },
 }
 
