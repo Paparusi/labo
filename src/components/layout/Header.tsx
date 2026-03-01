@@ -208,7 +208,12 @@ export default function Header({ user }: HeaderProps) {
                   <Link href="/worker/jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tìm việc</Link>
                   <Link href="/worker/saved-jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Việc làm đã lưu</Link>
                   <Link href="/worker/applications" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Đơn ứng tuyển</Link>
-                  <Link href="/worker/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tin nhắn</Link>
+                  <Link href="/worker/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                    Tin nhắn {unreadMessages > 0 && <Badge className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0">{unreadMessages}</Badge>}
+                  </Link>
+                  <Link href="/worker/notifications" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                    Thông báo {unreadNotifications > 0 && <Badge className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0">{unreadNotifications}</Badge>}
+                  </Link>
                   <Link href="/worker/profile" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Hồ sơ</Link>
                 </>
               ) : (
@@ -216,7 +221,13 @@ export default function Header({ user }: HeaderProps) {
                   <Link href="/factory/dashboard" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Bảng điều khiển</Link>
                   <Link href="/factory/jobs" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tin tuyển dụng</Link>
                   <Link href="/factory/workers" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tìm công nhân</Link>
-                  <Link href="/factory/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Tin nhắn</Link>
+                  <Link href="/factory/messages" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                    Tin nhắn {unreadMessages > 0 && <Badge className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0">{unreadMessages}</Badge>}
+                  </Link>
+                  <Link href="/factory/notifications" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                    Thông báo {unreadNotifications > 0 && <Badge className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0">{unreadNotifications}</Badge>}
+                  </Link>
+                  <Link href="/factory/profile" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Hồ sơ</Link>
                   <Link href="/factory/subscription" className="block py-2 text-gray-700" onClick={() => setMobileMenuOpen(false)}>Gói dịch vụ</Link>
                 </>
               )}
