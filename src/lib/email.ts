@@ -1,8 +1,12 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const FROM_EMAIL = 'Labo <noreply@labo.vn>'
+
+function getResendClient(): Resend | null {
+  const key = process.env.RESEND_API_KEY
+  if (!key || key === 'your_resend_api_key') return null
+  return new Resend(key)
+}
 
 export async function sendEmail({
   to,
@@ -13,13 +17,14 @@ export async function sendEmail({
   subject: string
   html: string
 }): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
+  const client = getResendClient()
+  if (!client) {
     console.log('[Email] Skipping (no RESEND_API_KEY):', { to, subject })
     return
   }
 
   try {
-    await resend.emails.send({
+    await client.emails.send({
       from: FROM_EMAIL,
       to,
       subject,
