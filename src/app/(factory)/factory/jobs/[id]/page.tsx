@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Users, MapPin, Banknote, Clock, CheckCircle2, XCircle, Loader2, User, MessageSquare, Star } from 'lucide-react'
+import { ArrowLeft, Users, MapPin, Banknote, Clock, CheckCircle2, XCircle, Loader2, User, MessageSquare, Star, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatSalaryRange } from '@/lib/geo'
 import type { Application, WorkerProfile } from '@/types'
@@ -34,7 +34,7 @@ export default function JobDetailPage() {
 
       const { data: appData } = await supabase
         .from('applications')
-        .select('*, worker_profiles!applications_worker_profile_fkey(*)')
+        .select('*, worker_profiles!applications_worker_profile_fkey(*, resume_url, resume_filename)')
         .eq('job_id', id)
         .order('applied_at', { ascending: false })
 
@@ -200,6 +200,21 @@ export default function JobDetailPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {(() => {
+                        const resumeUrl = (app.worker as Record<string, unknown> | undefined)?.resume_url as string | undefined
+                        return resumeUrl ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                            asChild
+                          >
+                            <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                              <FileText className="h-4 w-4 mr-1" />CV
+                            </a>
+                          </Button>
+                        ) : null
+                      })()}
                       <Button
                         size="sm"
                         variant="outline"

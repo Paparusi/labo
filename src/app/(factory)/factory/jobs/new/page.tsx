@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 import Header from '@/components/layout/Header'
@@ -12,12 +12,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Plus, X, Save, Navigation, AlertTriangle } from 'lucide-react'
+import { Loader2, Plus, X, Save, Navigation, AlertTriangle, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import AddressAutocomplete from '@/components/shared/AddressAutocomplete'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { canPostJob } from '@/lib/subscription'
-import type { Subscription, SubscriptionPlan } from '@/types'
+import type { Subscription, SubscriptionPlan, JobTemplate } from '@/types'
 
 const INDUSTRIES = [
   'electronics', 'garment', 'footwear', 'food',
@@ -57,6 +57,7 @@ export default function NewJobPage() {
     longitude: null as number | null,
   })
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { latitude, longitude } = useGeolocation()
   const supabase = createClient()
 
@@ -84,6 +85,33 @@ export default function NewJobPage() {
         setActiveJobCount(count || 0)
         setLimitChecked(true)
 
+        // Load template if specified
+        const templateId = searchParams.get('template')
+        if (templateId) {
+          const { data: tmpl } = await supabase
+            .from('job_templates')
+            .select('*')
+            .eq('id', templateId)
+            .eq('factory_id', authUser.id)
+            .single()
+          if (tmpl) {
+            const d = (tmpl as JobTemplate).template_data
+            setForm(prev => ({
+              ...prev,
+              title: d.title || prev.title,
+              description: d.description || prev.description,
+              industry: d.industry || prev.industry,
+              skills_required: d.skills_required || prev.skills_required,
+              salary_min: d.salary_min != null ? String(d.salary_min) : prev.salary_min,
+              salary_max: d.salary_max != null ? String(d.salary_max) : prev.salary_max,
+              positions: d.positions != null ? String(d.positions) : prev.positions,
+              shift_type: d.shift_type || prev.shift_type,
+              gender_requirement: d.gender_requirement || prev.gender_requirement,
+            }))
+            toast.success(`Đã tải mẫu "${tmpl.name}"`)
+          }
+        }
+
         // Get factory location as default
         const { data: factory } = await supabase
           .from('factory_profiles')
@@ -102,7 +130,7 @@ export default function NewJobPage() {
       }
     }
     fetchData()
-  }, [supabase])
+  }, [supabase, searchParams])
 
   const handleSubmit = async (e: React.FormEvent, status: 'active' | 'draft' = 'active') => {
     e.preventDefault()
@@ -336,6 +364,37 @@ export default function NewJobPage() {
               Đăng tin tuyển
             </Button>
           </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full text-gray-500 hover:text-emerald-600"
+            onClick={async () => {
+              const templateName = prompt('Đặt tên cho mẫu này:')
+              if (!templateName?.trim()) return
+              const { data: { user } } = await supabase.auth.getUser()
+              if (!user) return
+              const template_data: Record<string, unknown> = {}
+              if (form.title) template_data.title = form.title
+              if (form.description) template_data.description = form.description
+              if (form.industry) template_data.industry = form.industry
+              if (form.skills_required.length > 0) template_data.skills_required = form.skills_required
+              if (form.salary_min) template_data.salary_min = Number(form.salary_min)
+              if (form.salary_max) template_data.salary_max = Number(form.salary_max)
+              if (form.positions !== '1') template_data.positions = Number(form.positions)
+              if (form.shift_type !== 'day') template_data.shift_type = form.shift_type
+              if (form.gender_requirement) template_data.gender_requirement = form.gender_requirement
+              const { error } = await supabase.from('job_templates').insert({
+                factory_id: user.id,
+                name: templateName.trim(),
+                template_data,
+              })
+              if (error) toast.error('Lưu mẫu thất bại')
+              else toast.success('Đã lưu mẫu tin tuyển dụng')
+            }}
+          >
+            <FileText className="h-4 w-4 mr-2" />Lưu làm mẫu
+          </Button>
         </form>
       </div>
     </div>

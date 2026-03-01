@@ -16,6 +16,7 @@ import { ProfileSkeleton } from '@/components/shared/PageSkeleton'
 import { toast } from 'sonner'
 import ImageUpload from '@/components/shared/ImageUpload'
 import AddressAutocomplete from '@/components/shared/AddressAutocomplete'
+import ResumeUpload from '@/components/shared/ResumeUpload'
 import ChangePassword from '@/components/shared/ChangePassword'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import type { WorkerProfile } from '@/types'
@@ -264,6 +265,26 @@ export default function WorkerProfilePage() {
                   </Select>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Resume/CV */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Hồ sơ / CV</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {profile.user_id ? (
+                <ResumeUpload
+                  userId={profile.user_id}
+                  resumeUrl={(profile as Record<string, unknown>).resume_url as string | null}
+                  resumeFilename={(profile as Record<string, unknown>).resume_filename as string | null}
+                  onUpload={(url, filename) => setProfile(prev => ({ ...prev, resume_url: url, resume_filename: filename } as Partial<WorkerProfile>))}
+                  onRemove={() => setProfile(prev => ({ ...prev, resume_url: null, resume_filename: null } as Partial<WorkerProfile>))}
+                />
+              ) : (
+                <p className="text-sm text-gray-500">Lưu hồ sơ trước để tải lên CV</p>
+              )}
             </CardContent>
           </Card>
 

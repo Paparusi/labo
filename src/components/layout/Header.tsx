@@ -18,6 +18,7 @@ import {
 import {
   Bell, Menu, X, MapPin, User, LogOut, Building2, Briefcase,
   ChevronDown, MessageSquare, HardHat, Shield, Settings,
+  FileText, GitBranch, BarChart3,
 } from 'lucide-react'
 
 /* ─────────────────────────────────────────────
@@ -70,6 +71,9 @@ const ROLE_CONFIG: Record<string, {
     profile: '/factory/profile',
     home: '/factory/dashboard',
     extra: [
+      { href: '/factory/templates', label: 'Mẫu tin tuyển', Icon: FileText },
+      { href: '/factory/pipeline', label: 'Quy trình tuyển', Icon: GitBranch },
+      { href: '/factory/analytics', label: 'Phân tích', Icon: BarChart3 },
       { href: '/factory/subscription', label: 'Gói dịch vụ', Icon: Briefcase },
       { href: '/factory/settings', label: 'Cài đặt', Icon: Settings },
     ],

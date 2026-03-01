@@ -8,12 +8,23 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Building2, MapPin, Banknote, Clock, Loader2, Star } from 'lucide-react'
+import { Building2, MapPin, Banknote, Clock, Loader2, Star, GitBranch } from 'lucide-react'
 import { toast } from 'sonner'
 import ReviewForm from '@/components/shared/ReviewForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { formatSalaryRange } from '@/lib/geo'
-import type { Application } from '@/types'
+import type { Application, ApplicationStage } from '@/types'
+
+const STAGE_LABELS: Record<ApplicationStage, string> = {
+  applied: 'Đã ứng tuyển',
+  screening: 'Sàng lọc',
+  interview: 'Phỏng vấn',
+  offer: 'Đề nghị',
+  hired: 'Đã tuyển',
+  rejected: 'Từ chối',
+}
+
+const STAGE_ORDER: ApplicationStage[] = ['applied', 'screening', 'interview', 'offer', 'hired']
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: { label: 'Chờ xử lý', color: 'bg-yellow-100 text-yellow-700' },
@@ -37,7 +48,7 @@ export default function WorkerApplicationsPage() {
 
       const { data } = await supabase
         .from('applications')
-        .select('*, jobs(*, factory_profiles!jobs_factory_profile_fkey(company_name, logo_url, address))')
+        .select('*, stage, jobs(*, factory_profiles!jobs_factory_profile_fkey(company_name, logo_url, address))')
         .eq('worker_id', authUser.id)
         .order('applied_at', { ascending: false })
 
@@ -131,6 +142,15 @@ export default function WorkerApplicationsPage() {
                               <Badge className={STATUS_CONFIG[app.status]?.color}>
                                 {STATUS_CONFIG[app.status]?.label}
                               </Badge>
+                              {(() => {
+                                const stage = (app as unknown as Record<string, unknown>).stage as ApplicationStage | undefined
+                                return stage && stage !== 'applied' && stage !== 'rejected' ? (
+                                  <span className="text-xs text-emerald-600 flex items-center gap-1">
+                                    <GitBranch className="h-3 w-3" />
+                                    {STAGE_LABELS[stage]}
+                                  </span>
+                                ) : null
+                              })()}
                               {app.status === 'pending' && (
                                 <Button variant="ghost" size="sm" className="text-red-600" onClick={() => setWithdrawId(app.id)}>
                                   Rút đơn

@@ -158,6 +158,46 @@ export interface Notification {
   created_at: string
 }
 
+// ==================== Phase 3 Types ====================
+export type ApplicationStage = 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected'
+
+export interface JobTemplate {
+  id: string
+  factory_id: string
+  name: string
+  template_data: {
+    title?: string
+    description?: string
+    industry?: string
+    skills_required?: string[]
+    salary_min?: number
+    salary_max?: number
+    positions?: number
+    shift_type?: string
+    gender_requirement?: string
+  }
+  created_at: string
+  updated_at: string
+}
+
+export interface StageHistoryEntry {
+  id: string
+  application_id: string
+  from_stage: ApplicationStage | null
+  to_stage: ApplicationStage
+  changed_by: string
+  note: string | null
+  created_at: string
+}
+
+export interface ApplicantNote {
+  id: string
+  application_id: string
+  factory_id: string
+  content: string
+  created_at: string
+}
+
 // ==================== API Types ====================
 export interface NearbyJobsQuery {
   latitude: number
