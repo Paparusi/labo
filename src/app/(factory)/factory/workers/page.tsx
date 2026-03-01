@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Header from '@/components/layout/Header'
 import MapView from '@/components/map/MapView'
@@ -215,7 +216,7 @@ export default function FactoryWorkersPage() {
                         <User className="h-6 w-6 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900">{worker.full_name}</h3>
+                        <Link href={`/worker/${worker.user_id}`} className="font-semibold text-gray-900 hover:text-emerald-600">{worker.full_name}</Link>
                         {ratings[worker.user_id] && ratings[worker.user_id].review_count > 0 && (
                           <div className="flex items-center gap-1 mb-1">
                             <StarRating rating={ratings[worker.user_id].avg_rating} size="sm" />
