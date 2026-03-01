@@ -287,6 +287,9 @@ export default function WorkerJobDetailPage() {
                   </a>
                 </div>
               )}
+              <Link href={`/factory/${job.factory_id}`} className="inline-block mt-2 text-sm text-emerald-600 hover:underline font-medium">
+                Xem hồ sơ nhà máy
+              </Link>
             </CardContent>
           </Card>
         )}

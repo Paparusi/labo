@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Users, Clock, MapPin, Loader2, Eye, Trash2 } from 'lucide-react'
+import { Plus, Users, Clock, MapPin, Loader2, Eye, Trash2, Pencil } from 'lucide-react'
 import { formatSalaryRange } from '@/lib/geo'
 import type { User, Job } from '@/types'
 
@@ -131,6 +131,11 @@ export default function FactoryJobsPage() {
                             <Button variant="ghost" size="sm" asChild>
                               <Link href={`/factory/jobs/${job.id}`}>
                                 <Eye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button variant="ghost" size="sm" asChild>
+                              <Link href={`/factory/jobs/${job.id}/edit`}>
+                                <Pencil className="h-4 w-4" />
                               </Link>
                             </Button>
                             {job.status === 'active' ? (
